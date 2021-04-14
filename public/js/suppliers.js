@@ -38,9 +38,9 @@ async function load_all(){
 async function load_orders(){
     try {
         let {id} = GV.supplier;
-        let res = await ajax2(GV.base_url+'ajax_supplier/load_orders', {supplier_id: id});
-        console.log(res);
-        index_all(res);
+        const {orders} = await ajax2(GV.base_url+'ajax/load_orders', {supplier_id: id});
+        console.log(orders);
+        index_all(orders);
     } catch (e) {
         console.error(e);
         $('.loading-container').append('<div style="color:red">Une erreur s\'est produite</div>');
