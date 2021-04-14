@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ANTIGASPI</title>
+	<base href="./">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="shortcut icon" href="./images/logo_gaspi_icon_radius.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/fr.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRzO-AIr4QKIoVd4LBfXWDsY7hKUuH7lc&v=3.exp&signed_in=true&libraries=places"></script>
+    
+
+    <link rel="stylesheet" type="text/css" href="./css/general.css">
+    <link rel="stylesheet" type="text/css" href="./css/index.css">    
+</head>
+
+<body>
+ 
+    <div id="header" class="header"> 
+        <div class="header-category header-button active-header-button" data-name="main"> 
+            <div class="header-button-icon"><img src="./images/food-icon-gray.png" style="height:32px;"/><img src="./images/food-icon-black.png" style="height:32px;"/></div>
+            <div>PANIERS</div>
+        </div>
+        <div class="header-category header-button" data-name="history" > 
+            <div class="header-button-icon"><img src="./images/tickets-icon-gray.png" style="height:27px;"/><img src="./images/tickets-icon-black.png" style="height:27px;"/></div>
+            <div id="history-notification" class="header-notification">0</div>
+            <div>COMMANDES</div>
+        </div>
+        <div class="header-category header-button" data-name="profile" > 
+            <div class="header-button-icon"><img src="./images/profile-icon-gray.png"/><img src="./images/profile-icon-black.png"/></div>
+            <div>PROFIL</div>
+        </div>
+    </div>
+    
+    <div class="black-screen"></div>
+        
+        
+    <div id="content">
+
+        <div id="main-page" class="page">
+            <div class="open-map website-header main-color b-white">
+                <div style="text-align:center;  font-size:18px; padding-top:15px;">
+                    <img style="height:30px; padding:2px 15px 2px 10px; vertical-align:middle;"  src="./images/location-icon.png"/>
+                    Lieu: <strong id="place-name"></strong>
+                </div>           
+            </div>
+            <div id="open-categories" class="btn">Choisir une categorie</div>          
+            <div id="category-title" class="title"></div>                  
+            <div id="products-container">
+            </div>
+        </div>
+
+         
+        <div id="product-page" class="panel" style="text-align:left;" >
+           
+        </div>   
+
+        <div id="cart-page" class="panel" style="text-align:left;" >
+           
+        </div>   
+
+        <div id="profile-page" class="page">  
+            <div class="top-header-title">
+                <div id="open-profile-update-panel" class="open-panel" data-panel="profile-update-panel" style="float:right; padding:0px 20px;"><img src="./images/gear-icon-gray.png" style="height:25px; margin-top:10px;"/></div>
+                <div>PROFIL</div>
+            </div>
+            <div id="profile-page-content">
+                <div id="user-profile-picture" >
+                    <img src="./images/profile1.jpg" class="centered-absolute-image"/>
+                </div>
+            
+                <div id="user-profile-name" class="main-color" ></div>
+                <div id="user-profile-phone-number"></div>
+                <div id="user-profile-address"> </div>
+                
+                <div class="profile-stat" style="width:95%; margin-top:25px; height:auto;">
+                    <div class="profile-stat-icon" style="display:inline-block; width:40%; text-align:center; vertical-align: middle;"><img src="./images/shopping-basket.png"/></div
+
+                    ><div style="display:inline-block; width:60%; vertical-align: middle;">
+                        <div class="bold c-ciel7"> <span id="profile-points">110</span> POINTS GAGNÉS </div>
+                        <div> Les points vous permettent d'avoir des <strong>repas gratuits</strong>. </div>
+                    </div>
+                </div
+                ><div class="profile-stat">
+                    <div class="profile-stat-icon"><img src="./images/purse-icon.png"/></div>
+                    Vous avez fait  <div id="profile-economies" class="bold main-color"> 12 500 DA </div>  d'économies
+                    
+                </div
+                ><div class="profile-stat">
+                    <div class="profile-stat-icon"><img src="./images/food-icon-red.png"/></div>
+                    Vous avez bénéficié de <span class="bold c-red5"><span id="profile-points2">0</span> Paniers </span> 
+                    
+                </div>
+
+                <div id="user-disconnect" class="btn " style="margin-top:20px;">
+                        DECONNEXION
+                    </div>
+            </div>
+
+        </div>
+        
+        <div id="history-page" class="page">
+            <div class="history-category-container">
+                <div class="title" style="color:rgba(255, 123, 0, 1)" >COMMANDES EN COURS</div>
+                <div id="history-category0" class="history-category"></div>
+            </div
+
+            ><div class="history-category-container">
+                <div class="title">COMMANDES RÉCUPÉRÉES </br>(<span id="history-savings" style="font-weight:normal;"></span>)</div>
+                <div id="history-category1" class="history-category"></div>
+            </div
+
+            ><div class="history-category-container">
+                <div class="title">COMMANDES ANNULÉES</div>
+                <div id="history-category-1" class="history-category"></div>
+            </div>
+        </div>
+        
+           
+    </div>
+
+    <div id="main-categories-panel" class="panel" style="display:none;">
+        <div class="panel-header" style="box-shadow:none; border-bottom:1px solid #E8E8E8;">
+            <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+            <div>Choisir une catégorie</div>
+        </div>
+        <div class="panel-content center">
+            <div id="supplier-type-select">
+                <select id="supplier-type">
+                    <option selected value="retailer">Détaillant</option>
+                    <option value="wholeseller">Grossiste</option>
+                    <option value="individual">Particulier</option>
+                </select>
+            </div>
+            <div id="main-categories"></div>
+        </div>
+    </div>
+    
+       
+    <div id="order-confirm-panel" class="panel">
+        <div style="position:absolute; left:0px; top:0px; z-index:9999; padding:15px 20px;">
+            <img class="close-panel" src="./images/left-arrow-black.png" style="padding:0px 0px; height:30px;"/>      
+        </div>
+        <div style="margin:30px 0px 10px 0px;  text-align:center;">
+            <img src="./images/surprise-bag-icon.png" style="width:50%;"/>
+        </div>
+        <div class="title" style="text-align:center; padding:20px 0px;">
+            Confirmation
+        </div>
+        <div style="padding:0px 20px;">
+            Voulez-vous confirmer votre commande pour la récupérer directement auprès du commerce ? <br><br>
+
+        </div>
+        <div class="center" style="margin-top:15px;">
+            <div id="confirm-order-button" class="btn">CONFIRMER</div>                
+        </div>
+    </div>
+
+     <div id="map-panel" class="panel" style="display:none;">
+        <div class="panel-header" style="box-shadow:none; border-bottom:1px solid #E8E8E8;">
+            <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+            <div>CARTE</div>
+        </div>
+        <div class="panel-content center">
+            <div class="search">
+                <input id="map-panel-search" placeholder="Rechercher"  style="padding:18px 10px;"/>
+                <div id="map-position-btn" class="search-button" style="padding:15px 10px;"> <img src="./images/target-icon-green.png" /></div>
+            </div>
+            <div id="my-map" style="width:100%; height:65vh;"></div>
+        </div>
+        <div class="panel-footer">
+            <div id="save-map" class="btn  close-panel"  style="width:80%;">ENREGISTRER</div>                
+        </div>
+    </div>
+    
+    <div id="profile-update-panel" class="panel" style="display:none;">
+		<div class="panel-header">
+            <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+            <div>MODIFIER</div>
+        </div>
+        <div class="panel-content center " style="height:100vh; ">
+            <div class="form" data-id="profile-update" style="display:inline-block; width:95%; margin-bottom: 30px; margin-top:30px;">
+                <div class="gray">Nom et Prénom</div>
+                <input id="update-name" class="required" type="text"/>
+
+                <div class="gray">N° de téléphone</div>
+                <input id="update-phone_number"class="required"  type="number" />
+                
+                <div class="gray">Adresse e-mail</div>
+                <input id="update-email"  class="required" type="text"/>
+            
+                <div class="gray">Mot de passe</div>
+                <input  id="update-password" type="password" class="required" />
+            </div>
+        
+            <div id="profile-update-error" style="color:red; padding:5px 0px; text-align:center;"></div>
+            <div id="profile-update" class="btn ">ENREGISTRER</div>            
+        </div>
+     </div>
+
+             
+    <div id="order-success-panel" class="panel">
+        <div style="margin:40% 0px 10px 0px;  text-align:center;">
+            <img src="./images/tick-icon-green.png" style="width:50px;"/>
+        </div>
+        <div style="padding:20px 0px;">
+            <div class="title" style="text-align:center;  padding:0px 40px; font-size:18px;">
+                VOTRE COMMANDE A ÉTÉ ENREGISTRÉE AVEC SUCCÈS
+            </div>
+        </div>
+
+        <div class="center">
+            <div id="go-to-history" class="btn  close-all-panels" style="width:85%;">SUIVRE MA COMMANDE</div>                
+        </div>
+    </div>
+        
+    
+     
+     <div id="empty-panel" class="panel" >
+        <div class="panel-header main-color">
+            <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+            <div id="empty-panel-title"> VOS INFORMATIONS </div>
+        </div>
+        <div class="panel-content">
+        </div>
+    </div>
+
+
+    <script src="./js/general_functions.js"></script> 
+    <script>
+        GV={...GV, base_url:'./', ajax_url:'./a', android:false, swipers:{}, functions:{}, token:false};    
+        $(document).ready(function(){  
+            initialize_map($('#my-map'),'36.785090','3.062206',13);
+            init_page('main');
+			
+        });
+   </script>
+    <script src="./js/script.js"></script> 
+    </body>
+
+</html>

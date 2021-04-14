@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login | {{test}}</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="shortcut icon" href="./images/logo_gaspi_icon_radius.png" type="image/x-icon">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRzO-AIr4QKIoVd4LBfXWDsY7hKUuH7lc&v=3.exp&signed_in=true&libraries=places"></script>
+	
+    <link rel="stylesheet" type="text/css" href="./css/general.css">
+	<link rel="stylesheet" type="text/css" href="./css/index.css">    
+</head>
+<body>      
+	<script>
+
+		GV={...GV,  swipers:{}, functions:{}, fb_app_id:"387635348411174"};    
+	
+		window.fbAsyncInit = function() {
+		    FB.init({
+                appId      : GV.fb_app_id,
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v5.0'
+			});
+			// if(GV.table_name == "user"){
+				let path=`https://www.facebook.com/v5.0/dialog/oauth?client_id=${GV.fb_app_id}&redirect_uri=${encodeURI(GV.base_url+'all')}&state=0&scope=email`;
+				$('#login-form').prepend(`<a  id="fb-btn" class="btn form-btn" style="background:#3858ab; margin-top:15px;" href="${encodeURI(path)}">CONNEXION FACEBOOK</a>`)
+			// }
+		};
+        
+        (function(d, s, id){
+            let js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+				
+		
+
+		$(document).ready(function(){	
+			// GV.selected_lang = window.localStorage?.lang;
+			GV.selected_lang = "fr";
+			if(GV.selected_lang === undefined){
+				if(window.location.pathname !== "/admin"){
+					$('#first-frame').css({"display":"none"});
+					$('#select-language-frame').css({"display":"block"});
+				}
+			}
+			display_discover_screens();
+			display_form();
+		});
+		
+
+        $(document).on('click','#fb-btn', function(){
+			$(this).css('opacity','0.5');
+		});
+
+
+        $(document).on('click','#go-to-signup .btn', function(){
+			fade_panel($('#select-user-type-frame'));
+		});
+
+        $(document).on('click','#select-user-type-frame .signup-option', function(){
+			// alert();
+			let type = $(this).data("type");
+			GV.table_name = type;
+			display_form();
+			// fade_panel($('#signup-frame'));
+		});
+
+        $(document).on('click','#select-supplier-type-frame .signup-option', function(){
+			let type = $(this).data("type");
+			GV.supplier_type = type;
+			display_form();
+			// fade_panel($('#signup-frame'));
+		});
+
+        $(document).on('click','.language-option', function(){
+			let lang = $(this).data("lang");
+			if ("android" in window){
+				//TODO: save language to android storage
+			}else{
+				window.localStorage.lang = lang;
+				window.location.search = `lang=${lang}`;
+			}
+		});
+
+
+        $(document).on('click','.back-to-login', function(){
+			$(this).closest('.frame').css('display','none');
+			$(this).closest('.frame').parent().find('.frame').eq(1).fadeIn();
+		});
+
+        $(document).on('click','#signup-btn', function(){
+			if(!check_signup_form()){return;}
+			fade_panel($('#terms-panel'));
+		});
+
+		
+		$(document).on('click','#confirm-signup', function(){
+			signup();
+		});
+
+
+        $(document).on('click','#login-btn', function(){
+			if(!check_login_form()){return;}
+
+			login($('#login-email').val(), $('#login-password').val(), $(this));
+		});
+
+				
+		$(document).on('keyup','input', function(e){
+			if(e.keyCode == 13){      $(this).closest('.frame').find('.main-btn').click();  }
+		});
+    
+		function check_login_form(){
+			var res=true;
+			$('#login-form .required').each(function(){
+				if($(this).val() != ""){return true;}
+				$(this).css('border', '2px solid red');
+				res=false;
+			});
+			return res;
+		}
+
+		async function signup(){
+			let user = {type : GV.table_name, content:{has_read:1}};
+			$('#signup-frame .form').find('input, textarea, select').each(function(){
+				user[$(this).data('id')]=$(this).val();
+			});
+			console.log({user});
+			user = new_user_format(user, ["phone_number", "pic", "points", "fb_id", "address", "supplier_type", "rcn"]);
+			let data = await ajax2(GV.base_url+'signup', {user:JSON.stringify(user), table_name:GV.table_name}, $('#confirm-signup'));
+			console.log(data);
+			if(data.error){
+				$("#signup-error").text(data.error);
+			}else{
+				window.location.reload();
+			}	
+		}
+
+		function new_user_format(user, old_columns){
+			if(user.content == null) user.content = {} ;
+			old_columns.forEach((v) => {
+				user.content[v] = user[v];
+				delete user[v];
+			});
+			return user;
+		}
+
+		function check_signup_form(){
+			let res=true;
+			$('#signup-frame .required').each(function(){
+				if(!$(this).val()){
+					$(this).css("border","2px solid red");
+					res = false;
+				}else{
+					$(this).css("border","none");
+				} 
+			})
+			let $email = $(".login-form [data-id='email']");
+			const reg = new RegExp(/\w+@\w+\.\w+/);
+			if(!reg.test($email.val()) || $email.val()){
+				$email.css("border","2px solid red");
+				res = false;
+			};
+			return res;
+		}
+
+		async function login(email, password, $button){
+			console.log({email, password});
+			try {
+				let {new_user} = await ajax2(GV.base_url+'login', {email, password});	
+				window.location.reload();
+				
+			} catch (err) {
+				console.log(err);
+				let {responseJSON} = err;
+				$('#login-error').html(responseJSON.error);
+				$('#reset-password-container').css({display:"block"});
+			}
+		}
+
+
+		function display_form(){
+			var html="";
+			if(GV.table_name == "supplier"){
+				html = `<div class="gray">Nom de l'établissement</div>
+					<input data-id="name" value="" class="required"/>
+
+					<div class="gray">Adresse de l'établissement</div>
+					<input data-id="address" value="" class="required"/>
+					
+					<div class="gray">N° de téléphone</div>
+					<input data-id="phone_number" value="" type="number" class="required"/>
+
+					${(GV.supplier_type === "retailer") ? 
+					`<div class="gray">N° du registre du commerce</div>
+					<input data-id="rcn" value="" type="text" class="required"/>`
+					: 
+					`<div class="gray">N° de la carte d'identité nationale</div>
+					<input data-id="card_number" value="" type="text" class="required"/>
+					`}
+					
+					<div class="gray">Adresse e-mail</div>
+					<input data-id="email" type="text" value="" class="required"/>
+				
+					<div class="gray">Mot de passe</div>
+					<input  data-id="password" type="password" value=""  class="required"/>`;
+			}
+
+			if(GV.table_name == "user"){
+
+				html=`
+					<div class="gray">Nom et Prénom</div>
+                    <input data-id="name" class="required" type="text"/>
+
+                    <div class="gray">N° de téléphone</div>
+                    <input data-id="phone_number" class="required" type="number"/>
+                
+                    <div class="gray">Adresse e-mail</div>
+                    <input data-id="email" class="required" type="text"/>
+                
+                    <div class="gray">Mot de passe</div>
+                    <input data-id="password" class="required" type="password"/>`;
+			}
+
+			
+			// if(html == ""){$('#signup-frame, #go-to-signup').remove();}
+			$('#signup-frame .form').html(html);
+		}
+			
+   
+
+		
+		function display_discover_screens(){
+			if(GV.table_name != "users"){return;}
+			if($(window).width() > 800){return;}
+			$('#login-panel, #discover-panel').css('display','inline-block');
+		
+			var discover_screens=[
+				{icon:"discover-location-icon.png", title:"GÉOLOCALISEZ", txt:"les commerçants proposant des produits à sauver à petit prix", background:"background-white1.png", img:"screen1.png"},
+				{icon:"food-icon3-white.png", title:"CHOISISSEZ", txt:"les produits et les paniers qui vous conviennent sur l'application", background:"background-white2.png", img:"screen2.png"},
+				{icon:"food-basket-icon2-white.png", title:"RÉCUPÉREZ", txt:"votre commande au créneau spécifié chez le commerçant", background:"background-white3.png", img:"screen3.png"},
+				{icon:"gift-icon-white.png", title:"GAGNEZ", txt:"des points de fidélité à chaque achat et grâce au parrainage", background:"background-white4.png", img:"screen1.png"},
+			]
+			var html="";
+			$.each(discover_screens, function(i,v){
+				var name="SUIVANT";
+				if(i == discover_screens.length -1){name="TERMINER";}
+				html+=`<div class="discover-screen carousel-element">
+							<div><img src="${GV.base_url}images/${v.icon}" class="discover-screen-icon"></div>
+							<div class="discover-screen-title">${v.title}</div>
+							<div style="">${v.txt}</div>
+							<div class="discover-screen-pagination"></div>
+							<img src="${GV.base_url}images/${v.background}"  class="discover-screen-background" >
+							<img src="${GV.base_url}images/${v.img}"   class="discover-screen-image">
+							<div id="discover-next" class="discover-next">${name}</div>
+						</div>
+					`
+			});
+			html+=`<div class="discover-screen carousel-element" style="background:transparent;">
+				</div>
+				`
+			$('#discover-carousel').html(html);
+			carousel('#discover-carousel',{freeMode:false,  pagination: { el: '.discover-screen-pagination', type: 'bullets'}}, function(active_slide){
+				if(active_slide == discover_screens.length-1 ){
+					setTimeout(function(){
+						$('#discover-panel').fadeOut();
+					},500);
+				}
+			});
+
+		} 
+
+		$(document).on('click', '.discover-next', function(){
+			GV.swipers['#discover-carousel'].slideNext();
+		});
+
+
+
+		// PASSWORD RESET START
+		$(document).on('click','.reset-password', async () => {
+			let email = $("#login-email").val();
+			if(email != ""){
+				fade_panel($("#password-reset-panel"), true);
+				ajax2("/ajax/forgotten_password",{email})
+				.then(console.log)
+				.catch(console.error);
+			}else{
+				$("#login-error").text("Veuillez introduire une adresse email valide");
+			}
+		});
+		// PASSWORD RESET END
+
+		
+		
+	</script>  
+
+
+	<div id="login-panel" class="panel" style="width:100%; display:block;" >
+		<div class="panel-header">
+			<div>Connexion</div>
+		</div>
+		<div class="panel-content center" style="height:98vh; padding-bottom:200px;">
+			<div></div>
+
+			<div id="select-language-frame" class="frame" style="display:none; margin:auto; max-width:600px;">
+				<div class="title login-title" style="margin:60px 0px;">
+					Choisissez une langue:
+				</div>
+
+				<div class="language-option btn primary next-frame" data-lang="fr"><img src="./images/FR.svg"> <span>Français</span></div>
+				<div class="language-option btn primary next-frame" data-lang="en"><img src="./images/GB.svg"> <span>English</span></div>
+				<div class="language-option btn primary next-frame" data-lang="ar"><img src="./images/AR.svg"> <span>العربية</span></div>
+			</div>
+
+
+			<div id="first-frame" class="frame" style="margin:auto; max-width:600px;">
+				<img src="./images/login-icon-gray.png" style="width:110px; margin:20px 5px 0px 0px"/>
+				<div class="login-title" style="margin-bottom:0px;">
+					{{signin_to_continue}}
+				</div>
+				<div id="login-form" class="form login-form" data-id="supplier-login">
+			
+
+					<div class="gray" style="margin-top:20px;">{{email}}</div>
+					<input id="login-email" type="text" value="" class="required"/>
+				
+					<div class="gray">{{password}}</div>
+					<input  id="login-password" type="password" value=""  class="required"/>
+				</div>
+
+
+                <div id="login-error" class="error" style="width: 80%; margin: 0 auto;"></div>
+                <div id="reset-password-container" style="display:none; margin-top:10px; margin-bottom:10px;" >
+					<div class="gray" >{{forgotten_password}}</div>
+					<div class="link main-color reset-password">{{reset_password}}</div>
+				</div>
+				<div id="login-btn" class="btn primary">{{login}}</div>
+                
+				<div id="go-to-signup">
+					<div style="margin-top:25px;">{{no_account}}</div>
+					<div class="next-frame btn primary" style="margin-top:5px;">{{signup}}</div>
+				</div>
+
+			
+			</div>
+
+			<div id="select-user-type-frame" class="frame" style="display:none; margin:auto; max-width:600px;">
+				<div class="title login-title" style="margin:20px 0px;">
+					{{choose_option}}:
+				</div>
+				<div class="form login-form" data-id="supplier-signup"></div>
+
+				<div class="signup-option btn main-btn next-frame skip-frame" data-type="user">{{i_am_user}}</div>
+				<div class="signup-option btn main-btn next-frame" data-type="supplier">{{i_am_supplier}}</div>
+			</div>
+
+			<div id="select-supplier-type-frame" class="frame" style="display:none; margin:auto; max-width:600px;">
+				<div class="title login-title" style="margin:20px 0px;">
+					{{choose_option}}:
+				</div>
+				<div class="form login-form" data-id="supplier-signup"></div>
+
+				<div class="signup-option btn main-btn next-frame" data-type="retailer">Je suis un commeçant</div>
+				<div class="signup-option btn main-btn next-frame" data-type="normal">Je suis un particulier</div>
+			</div>
+
+
+			<div id="signup-frame" class="frame" style="display:none; margin:auto; max-width:600px;">
+				<div class="title login-title" style="margin:20px 0px;">
+					{{signup_to_continue}}
+				</div>
+				<div class="form login-form" data-id="supplier-signup">
+				
+				</div>
+
+				<div id="signup-error" class="error"></div>
+				<div id="signup-btn" class="btn primary" style="">{{signup}}</div>
+				<div style="margin-top:25px;">{{already_have_account}}</div>
+				<div class="btn primary back-to-login" style="margin-top:5px;">{{login}}</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="terms-panel" class="panel" >
+		<div class="panel-header">
+			<div>{{tos}}</div>
+		</div>
+		<div class="panel-content" style="padding:0px;">
+			<iframe src="/tos" frameborder="0" style="width: 100%; height: 85vh;"></iframe>
+		</div>
+		<div class="panel-footer">
+			<div id="confirm-signup" class="btn primary close-panel"  style="width:80%;">{{agree_tos}}</div>     
+		</div>
+	</div>
+
+	<div id="password-reset-panel" class="panel" >
+		<div class="panel-header">
+			<div>{{email_sent}}</div>
+		</div>
+		<div class="panel-content" style="padding:0px;">
+			<p style="margin: 35vh 10px;">{{password_reset_email}}.</p>
+		</div>
+		<div class="panel-footer">
+			<div id="confirm-signup" class="btn primary close-panel"  style="width:80%;">{{back}}</div>     
+		</div>
+	</div>
+
+	<div id="map-panel" class="panel" style="display:none;">
+        <div class="panel-header" style="box-shadow:none; border-bottom:1px solid #E8E8E8;">
+            <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+            <div>CARTE</div>
+        </div>
+        <div class="panel-content center">
+            <div class="search">
+                <input id="map-panel-search" placeholder="Rechercher"  style="padding:18px 10px;"/>
+                <div id="map-position-btn" class="search-button" style="padding:15px 10px;"> <img src="./images/target-icon-green.png" /></div>
+            </div>
+            <div id="my-map" style="width:100%; height:92%;"></div>
+        </div>
+        <div class="panel-footer">
+            <div id="save-map" class="btn  close-panel"  style="width:80%;">ENREGISTRER</div>                
+        </div>
+    </div>
+	
+	<div id="discover-panel" class="panel" style=" background:transparent; width:100vw;">
+		<div id="discover-carousel">
+	
+		</div>
+	</div>
+
+	
+	<input class="upload-image" type="file" accept="image/*"  style="display:none;"  />
+               
+    <script src="./js/general_functions.js"></script> 
+
+
+	
+</body>
+</html>

@@ -1,0 +1,139 @@
+*{padding: 0px; margin: 0px; border: none;   box-sizing: border-box;}
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Exo+2|Nunito|PT+Sans|Poppins|Raleway|Roboto|Source+Sans+Pro|Ubuntu&display=swap');
+body{ font-family:  'Roboto', 'Open Sans'; width:100vw; height:100vh; overflow-x: hidden; overflow-y: scroll; text-align: center; }
+input{display: block;}
+
+
+
+/*
+////////////////////////////////////////////////////////////
+////////////////////// 	PANELS  /////////////////////////////
+////////////////////////////////////////////////////////////
+*/
+
+.nav-panel-button{display:inline-block; width:100%; text-align: center; padding:20px 0px; border-bottom:1px solid RGBA(255,255,255,0.1); color:#fff;}
+#black-screen{width: 100vw;height: 100vh;background-color: #000b;z-index: 10;position: fixed; left:0px; top:0px; display: none;}
+.panel{display:none; background:#fff; width:30vw; height:100vh; text-align:center; position:fixed; top:0px; right:0px; z-index:99999; overflow: hidden; border:none;}
+.panel-header{width:100%; font-weight:bold; font-size:16px; text-align:center; padding: 15px 10px;   z-index:99; border-bottom:1px solid #E8E8E8; }
+.panel-back{ float:left; padding:0px 20px; margin-right:-45px; }
+.panel-back img{ height:25px; margin-top:10px;  }
+.panel-header div{ padding:10px 20px; }
+.panel-content{width:100%; height:100vh; overflow: hidden; overflow-y:scroll; padding-bottom:200px; text-align: center;}
+.panel-footer{width:30vw; position: absolute; bottom:0px; right:0px; text-align:center;  padding:15px 0px; box-shadow:-4px -4px 10px RGBA(0,0,0,0.2); background:#fff; z-index:999999; }
+.panel-footer .btn{width:80%; }
+.close-panel{cursor: pointer; }
+.panel-choice{padding:20px; background:#F0F0F0; margin:10px 0px; width:90%; display:inline-block; position:relative; border-radius:5px;}
+.panel-choice img{position:absolute; left:20px; top:12px; height:35px;}
+.panel-choice:hover{background:#E8E8E8; }
+.selected-panel-choice{background:#00ba57; color:#fff}
+			
+
+body .panel-slide-in { animation: slide_in 0.25s forwards; }
+body .panel-slide-out{ animation: slide_out 0.25s forwards; }
+
+body .half-panel.panel-slide-in { animation: half_slide_in 0.25s forwards; }
+body .half-panel.panel-slide-out{ animation: half_slide_out 0.25s forwards; }
+
+
+@keyframes slide_in { from {right:-100vw;} to {right:0px;}}
+@keyframes slide_out { from {right: 0px;} to {right:-100vw;}}
+
+@keyframes half_slide_in { from {right:-100vw;} to {right:0px;}}
+@keyframes half_slide_out { from {right: 0px;} to {right:-100vw;}}
+
+
+
+.mobile-footer{display:none; width:100vw; position: fixed; bottom:0px; right:0px; text-align:center;  padding:15px 0px; box-shadow:-4px -4px 10px RGBA(0,0,0,0.2); background:#fff; z-index:99; }
+.mobile-footer .btn{width:80%; font-size:15px;}
+@media screen and (min-width:0px) and (max-width:800px) {
+	.panel{width:100vw;}
+	.panel-footer{width:100vw;} 
+	.half-panel.panel{width:70vw;}
+	.half-panel.panel-footer{width:70vw;} 
+	.mobile-footer{display:block;}
+
+	@keyframes half_slide_in { from {left:-70vw;} to {left:0;}}
+    @keyframes half_slide_out { from {left: 0;} to {left:-70vw;}}
+    
+    @keyframes slide_in { from {left:-100vw;} to {left:0;}}
+	@keyframes slide_out { from {left: 0;} to {left:-100vw;}}
+}
+
+
+/*
+////////////////////////////////////////////////////////////
+////////////////////// 	General classes  /////////////////////////////
+////////////////////////////////////////////////////////////
+*/
+
+.block{display:block;}
+.circle{border-radius:50%;}
+.bold{font-weight:bold;}
+.fleft{float:left;}
+.fright{float:right;}
+.fnone{float:none;}
+.cboth{clear:both;}
+.center{text-align:center;}
+.left{text-align:left;}
+.right{text-align:right;}
+.b{font-weight:bold;}
+.n{font-weight:normal;}
+.vatop{vertical-align:top;}
+.vamiddle{vertical-align:middle;}
+.vabottom{vertical-align:bottom;}
+.box-shadow{ box-shadow:0px 2px 6px #ADADAD; }
+
+.orange{background-color: #ff7300}
+.green{background-color: #46c566;}
+.blue{background-color: #3264cf;}
+.pink{background-color: #e63763}
+.bold{font-weight: bold;}
+.border-top{border-top:1px solid #E8E8E8;}
+
+.btn{display:inline-block ;padding: 15px 20px;text-align: center;color: white; background:#00ba57; font-size: 15px;text-transform: uppercase;cursor: pointer; border-radius: 5px}
+.gray{color:RGBA(0,0,0,0.5);}
+.inline{display: inline-block;}
+.left{text-align:left;}
+.bs{box-shadow:3px 3px 6px RGBA(0,0,0,0.15);}
+
+.padding5{padding:5px;}
+.padding10{padding:10px;}
+.padding15{padding:15px;}
+.padding20{padding:20px;}
+.page{width: 100%;height: 100%;display: none;overflow-x: hidden; overflow-y: scroll;}
+
+.white-background{background:#fff;}
+.main-background{background:#00ba57;}
+.main-color{color:#00ba57;}
+.red-background{background-color: #ff6060}
+
+/*
+////////////////////////////////////////////////////////////
+////////////////////// 	POPUPS  /////////////////////////////
+////////////////////////////////////////////////////////////
+*/
+
+
+.popup-container{ justify-content:center; align-items:center; position:fixed; top:0px; width:100vw; height:100vh; z-index:99999; background:RGBA(0,0,0,0.5); text-align: center; display:none;}
+.popup{background:#fff; overflow:auto; display: inline-block; max-width:95%; }
+.popup-header{ padding:10px;   border-bottom:1px solid #E8E8E8;}
+.popup-content{ padding:20px;  max-height:75vh; overflow-y:scroll; }
+.popup-footer{padding:10px; background-color:#F7F7F7;}
+.closing-cross{color:#fff; float:right; cursor:pointer; opacity:0.7;}
+.closing-cross:hover{opacity:1;}
+
+
+/*
+////////////////////////////////////////////////////////////
+////////////////////// 	Progress  /////////////////////////////
+////////////////////////////////////////////////////////////
+*/
+
+.progress-bar-container{padding:20px; color:#fff; padding-top:0px;}
+.progress-bar-text{text-align: center; font-size:16px; padding:20px;  }
+.progress-bar{position:relative; width:100%; background:RGBA(255,255,255,0.2); display:inline-block; height:25px; text-align: left;}
+.progress-bar div{display:inline-block; height:25px; width:20%;  background:#fff; }
+.progress-bar span{position:absolute; left:35%; color:RGBA(255,255,255,1); padding-top:2px;}
+
+
+

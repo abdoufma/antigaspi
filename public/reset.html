@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialiser le mot de passe</title>
+    <link rel="stylesheet" href="css/general.css">
+    <style>
+        body {height: 100vh; width: 100vw; background-color: #e8e8e8}
+        main{
+            width: clamp(200px, 90%, 500px);
+            margin: 0 auto;
+            margin-top: 50px;
+            padding: 20px 15px;
+            border: 2px solid rgb(214, 214, 214);
+            border-radius: 15px;
+            box-shadow:  var(--shadow);
+            background-color: #fff;
+        }
+        h2{margin-bottom: 20px;}
+
+        .form{text-align:center;}
+        .form input{
+            display: block;
+            width: 80%;
+            background-color: #f1f1f1;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 20px;
+            letter-spacing: 2px;
+            border-radius: 5px;
+            margin: 10px auto;
+        }
+
+        .form .error{color: red;}
+
+        button{ text-align:center; font-size:18px; cursor:pointer; color:#fff; margin: 0 auto; margin-top: 20px; padding:10px 15px; background-color: rgb(13, 158, 44); border-radius:5px; text-transform: uppercase;}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <main>
+        <h2>Veuillez choisir un nouveau mot de passe</h2>
+        <div class="form">
+            <label for="new-pass">Nouveau mot de passe</label>
+            <input type="password" id="new-pass">
+
+            <label for="new-pass">Confirmer le nouveau mot de passe</label>
+            <input type="password" id="confirm-new-pass">
+            <div class="error"></div>
+            <button>Valider</button>
+        </div>
+    </main>
+
+    <script src="./js/general_functions.js"></script> 
+    <script>
+        $(document).on("ready", function(){
+
+        });
+
+        $(document).on("click", "button", async function(e){
+            if (check_form()) return;
+            await ajax2("/ajax/reset_password", {email: GV.email, password: $(':password').val()});
+            alert("Mot de passe réinitialisé avec succés");
+            close();
+        });
+
+
+        function check_form(){
+            let pass = $("#new-pass").val();
+            let confirm = $("#confirm-new-pass").val();
+            if(pass !== confirm){
+                console.log("oops")
+                $("input").addClass("oops");
+                $(".error").text("les mots de passe doivent être identiques.");
+                return false;
+            }
+        }
+
+
+
+    </script>
+</body>
+</html>

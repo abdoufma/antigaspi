@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Admin | ANTIGASPI</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="shortcut icon" href="./images/logo_gaspi_icon_radius.png" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/fr.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.9/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.9/js/select2.min.js"></script>
+	
+    <link rel="stylesheet" type="text/css" href="./css/general.css">
+	<link rel="stylesheet" type="text/css" href="./css/general_admin.css">    
+	<link rel="stylesheet" type="text/css" href="./css/admin.css">    
+	
+</head>
+
+<body id="body">
+    <div id="black-screen"></div>  
+    
+    <div id="header" class="header" > 
+        <div id="header-logo-container">
+            <img id="header-logo" src="./images/logo-white.png">
+        </div>
+		<div class="header-category header-button active-header-button admin-btn" data-name="suppliers" > 
+			<div class="header-button-icon"><img src="./images/contacts-icon-white.png" style="height:32px;"/><img src="./images/contacts-icon-gray.png" style="height:32px;"/></div>
+			<div>FOURNISSEURS</div>
+		</div>
+		<div class="header-category header-button admin-btn" data-name="users" > 
+			<div class="header-button-icon"><img src="./images/users-icon-white.png" style="height:32px;"/><img src="./images/users-icon-gray.png" style="height:32px;"/></div>
+			<div>UTILISATEURS</div>
+		</div>
+		<div class="header-category header-button" data-name="orders"> 
+			<div class="header-button-icon"><img src="./images/orders-icon-white.png" style="height:32px;"/><img src="./images/orders-icon-gray.png" style="height:32px;"/></div>
+			<div>COMMANDES</div>
+		</div>
+	
+		<div class="header-category header-button" data-name="products"> 
+			<div class="header-button-icon"><img src="./images/food-icon-white2.png" style="height:32px;"/><img src="./images/food-icon-gray.png" style="height:32px;"/></div>
+			<div>PRODUITS</div>
+        </div>
+	
+		<div class="header-category header-button admin-btn" data-name="categories"> 
+			<div class="header-button-icon"><img src="./images/categories-white.png" style="height:32px;"/><img src="./images/categories-lightgray.png" style="height:32px;"/></div>
+			<div>CATEGORIES</div>
+        </div>
+
+		<div class="header-category header-button admin-btn" data-name="dashboard"> 
+			<div class="header-button-icon"><img src="./images/categories-white.png" style="height:32px;"/><img src="./images/categories-lightgray.png" style="height:32px;"/></div>
+			<div>DASHBOARD</div>
+        </div>
+	
+		<!-- <div class="header-category header-button" data-name="feed"> 
+			<div class="header-button-icon"><img src="./images/activity-icon-white2.png" style="height:32px;"/><img src="./images/activity-icon-gray2.png" style="height:32px;"/></div>
+			<div>PUBLICATIONS</div>
+        </div> -->
+        
+		<div class="header-category header-button supplier-btn" data-name="profile"> 
+			<div class="header-button-icon"><img src="./images/profile-icon-white.png" style="height:32px;"/><img src="./images/profile-icon-gray.png" style="height:32px;"/></div>
+			<div>PROFIL</div>
+		</div>
+	
+		<!-- <div class="header-category header-button" data-name="dashboard"> 
+			<div class="header-button-icon"><img src="./images/dashboard-icon-white.png" style="height:27px;"/><img src="./images/dashboard-icon-gray.png" style="height:27px;"/></div>
+			<div>Dashboard</div>
+        </div> -->
+
+		<div id="disconnect-button" class="header-category header-button" data-name="disconnect"> 
+			<div class="header-button-icon"><img src="./images/logout-icon-gray.png" style="height:32px;"/><img src="./images/logout-icon-gray.png" style="height:32px;"/></div>
+			<div>Déconnexion</div>
+		</div>
+	</div>
+    
+
+	<div id="content">  
+        <div class="top-header-title">
+            <div id="top-header-text" class="main-color">Utilisateurs</div
+            ><div id="header-search"><input placeholder="Rechercher un élément"/><img src="./images/search-icon-gray.png"/></div
+            ><div id="header-admin">
+                <div class="header-admin-icon">
+                    <img src="./images/bell-icon-gray.png"/>
+                </div
+                ><div id="admin-popover" class="header-admin-icon" style="position:relative;">
+                    <img src="./images/gear-icon-gray.png"/>
+                </div
+                ><div class="header-admin-name darkgray">
+                    ...
+                </div
+                ><div class="header-admin-image">
+                    <img src="./images/uploads/default-user.jpg"/>
+                </div>
+            </div>
+        </div>
+        
+        <div id="users-page" class="page center"  style="display:block;">
+            <div id="users-container"  class="table-container" >
+                <div class="table-filters">
+                    <div class="fleft bold" style="padding:20px 0px;">
+                        Liste des Utilisateurs
+                    </div>
+            
+                    <div class="gray inline" style="padding:0px 15px;">Filtrer par</div
+                    ><select class="filter-select main-color"><option selected value="2">Date</option></select
+                    
+                    ><div id="new-user" class="btn reinitialize-form open-panel" data-form="user" data-panel="user-panel">Nouvel utilisateur</div>
+                </div>
+                <div id="users-table" class="grid-table" >
+                    <div class="loading-container"><img src="./images/orange-loading.gif" ></div>
+                </div>
+            </div>
+            <div class="mobile-footer">
+                <div id="new-user" class="btn reinitialize-form open-panel" data-form="user" data-panel="user-panel">Nouvel utilisateur</div>
+            </div>
+        </div>
+        
+        
+        <div id="suppliers-page" class="page center"  style="display:block;">
+            <div id="suppliers-container"  class="table-container" >
+                <div class="table-filters">
+                    <div class="fleft bold" style="padding:20px 0px;">
+                        Liste des fournisseurs
+                    </div>
+            
+                    <div class="gray inline" style="padding:0px 15px;">Filtrer par</div
+                    ><select class="filter-select main-color"><option selected value="2">Date</option></select
+                    
+                    ><div id="new-supplier" class="btn reinitialize-form open-panel" data-form="supplier" data-panel="supplier-panel">Nouveau Fournisseur</div>
+                </div>
+                <div id="suppliers-table" class="grid-table" >
+                    <div class="loading-container"><img src="./images/orange-loading.gif" ></div>
+                </div>
+            </div>
+            <div class="mobile-footer">
+                <div id="new-supplier" class="btn reinitialize-form open-panel" data-form="supplier" data-panel="supplier-panel">Nouveau Fournisseur</div>
+            </div>
+        </div>
+        
+        <div id="products-page" class="page center"  style="display:block;">
+            <div id="products-container"  class="table-container" >
+                <div class="table-filters">
+                    <div class="fleft bold" style="padding:20px 0px;">
+                        Liste des produits
+                    </div>
+            
+                    <div class="gray inline" style="padding:0px 15px;">Filtrer par</div
+                    ><select class="filter-select main-color"><option selected value="2">Date</option></select
+                    
+                    ><div id="new-product" class="btn reinitialize-form open-panel" data-form="product" data-panel="product-panel">Nouveau Produit</div>
+                </div>
+                <div id="products-table" class="grid-table" >
+                    <div class="loading-container"><img src="./images/orange-loading.gif" ></div>
+                </div>
+            </div>
+            <div class="mobile-footer">
+                <div id="new-product" class="btn reinitialize-form open-panel" data-form="product" data-panel="product-panel">Nouveau Produit</div>
+            </div>
+		</div>
+
+        
+        <div id="orders-page" class="page center"  style="display:block;">
+            <div id="orders-container"  class="table-container" >
+                <div class="table-filters">
+                    <div class="fleft bold" style="padding:20px 0px;">
+                        Liste des commandes
+                    </div>
+            
+                    <div class="gray inline" style="padding:0px 15px;">Filtrer par</div
+                    ><select class="filter-select main-color"><option selected value="2">Date</option></select>
+                </div>
+                <div id="orders-table" class="grid-table" >
+                    <div class="loading-container"><img src="./images/orange-loading.gif" ></div>
+                </div>
+            </div>
+   
+        </div>
+        
+        <div id="categories-page" class="page center"  style="display:block;">
+            <div id="categories-container"  class="table-container" >
+                <div class="table-filters">
+                    <div class="fleft bold" style="padding:20px 0px;">
+                        Liste des categories
+                    </div>
+            
+                    <div class="gray inline" style="padding:0px 15px;">Filtrer par</div
+                    ><select class="filter-select main-color"><option selected value="2">Date</option></select
+                    
+                    ><div class="btn reinitialize-form open-panel" data-form="category" data-panel="category-panel">Nouvelle categorie</div>
+                </div>
+                <div id="categories-table" class="grid-table" >
+                    <div class="loading-container"><img src="./images/orange-loading.gif" ></div>
+                </div>
+            </div>
+   
+        </div>
+        
+        <div id="dashboard-page" class="page center" >
+            <div id="dashboard-cards" >
+                <div class="dashboard-card blue-background">
+                    <div class="dashboard-card-icon"><img src="./images/orders-icon-white.png"/></div>
+                    <div class="dashboard-card-title">Chiffre d'affaires</div>
+                    <div id="chiffre-count" class="dashboard-card-value"></div>  
+                </div>
+                <div class="dashboard-card orange-background">
+                    <div class="dashboard-card-icon"><img src="./images/orders-icon-white.png"/></div>
+                    <div class="dashboard-card-title">Nombre de commandes</div>
+                    <div id="orders-count" class="dashboard-card-value">-</div>  
+                </div>
+                <div class="dashboard-card green-background">
+                    <div class="dashboard-card-icon"><img src="./images/users-icon-white.png"/></div>
+                    <div class="dashboard-card-title">Nombre d'utilisateurs</div>
+                    <div id="users-count" class="dashboard-card-value"></div>  
+                </div>
+                <div class="dashboard-card red-background">
+                    <div class="dashboard-card-icon"><img src="./images/food-icon-white.png"/></div>
+                    <div class="dashboard-card-title">Nombre de produits</div>
+                    <div id="products-count" class="dashboard-card-value"></div>  
+                </div>
+            </div>
+            <div id="dashboard-charts" >
+                <div class="dashboard-chart-container">
+                    <div class="gray">Données insuffisantes <br> pour générer une courbe</div>
+                    <!-- <canvas id="my-chart1"  class="chart"></canvas> -->
+                </div>
+                <div class="dashboard-chart-container" >
+                    <div class="gray">Données insuffisantes <br> pour générer une courbe</div>
+
+                    <!-- <canvas id="my-chart2" class="chart"></canvas> -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="feed-page" class="page center" >
+            <div class="btn open-panel" data-panel="publication-panel" style="margin:30px 0px; width:100%; max-width: 400px; padding:15px; font-weight:bold;">Nouvelle publication</div>
+            <div id="feed">
+            </div>
+		</div>
+
+
+        <div id="profile-page" class="page center" style="position:relative; background-color:#fff;">
+            <div style="margin:auto; max-width:500px;">
+                <div id="supplier-logo-container2" class="round-logo-container">
+                    <img  class="centered-absolute-image" src="./images/uploads/new-logo.png" style="padding:5px"/>
+                    <input id="supplier-logo-name2" class="image-name" type="hidden" />
+                </div>
+            
+                <div id="crm-profile-form" class="form" data-id="save-profile">
+                    <div class="gray">Nom de l'établissement</div>
+                    <input id="profile-name" value="" class="required"/>
+
+                    <div class="gray">Adresse de l'établissement</div>
+                    <input id="profile-address" value="" class="required"/>
+                    
+                    <div class="gray">N° de téléphone</div>
+                    <input id="profile-phone_number" value="" type="number" class="required"/>
+                    
+                    <div class="gray">E-mail</div>
+                    <input id="profile-email" value="" class="required"/>
+                    
+                    <div class="gray">Mot de passe</div>
+                    <input id="profile-password" value="" type="password" class="required"/>
+
+
+                    <div class="gray">Points dé fidélité <br> (pour un repas gratuit)</div>
+                    <div class="disponibility">
+                        <div class="disponibility-btn main-color" data-action="minus">-</div>
+                        <div id="profile-points" class="disponibility-number">8</div>
+                        <div class="disponibility-btn main-color" data-action="plus">+</div>
+                    </div>	
+                </div>
+                <div id="crm-profile-stats" style="margin-top:30px;">
+                    <div class="profile-stat">
+                        <div class="profile-stat-icon"><img src="./images/purse-icon.png"/></div>
+                        Vous avez gagné  <div class="bold main-color"> 0 DA </div>
+                        
+                    </div
+                    ><div class="profile-stat">
+                        <div class="profile-stat-icon"><img src="./images/food-icon-red.png"/></div>
+                        Vous avez généré <div class="bold c-red5"> 0 Commandes </div> 
+                    </div>
+                </div>
+                
+            
+                
+                <div id="crm-profile-footer" style="margin-bottom:50px; margin-top:30px;">
+                    <div id="save-profile-error" class="error"></div>
+                    <div id="save-profile" class="btn " style="width:80%; padding:15px;">ENREGISTRER</div>
+                </div>
+
+                
+                <div id="supplier-disconnect" class="btn " style="margin-top:20px; margin-bottom:150px; width:80%; padding:15px;  background:tomato;">
+                    DECONNEXION
+                </div>
+            </div>
+        </div>
+        
+
+	
+
+
+		<div id="publication-panel" class="panel">
+			<div class="panel-header">
+				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+				<div>PUBLICATION</div>
+            </div>            
+            <div class="panel-content">
+                <div id="publication-form"  class="form" >
+                    <div id="publication-upload-container" style="display:none; margin-bottom:30px; background-color:#E8E8E8; text-align:center; padding:65px 0px; ">
+                        <img src="./images/camera-icon-gray.png" style="width:50px;"/>
+                    </div>
+
+                    <div id="publication-image-container" class="relative-wrap" style="position:relative; width:100%; margin-bottom:30px;">
+                        <img id="publication-image" src="./images/uploads/dejeuner1.jpg" style="width:100%;"/>
+                        <input id="publication-image-name" class="image-name" data-id="img" type="hidden"/>
+                    </div>
+
+                    <input data-id="id" type="hidden"/>
+
+                    <div class="gray">Titre</div>
+					<input data-id="title" class="required" />
+
+                    <div class="gray">Texte</div>
+					<textarea data-id="txt" class="required" rows="8"></textarea>            
+               </div>
+            </div>
+			<div class="panel-footer">
+				<div class="error"></div>
+				<div class="delete-item btn" data-table="publications" style="width:40%;">SUPPRIMER</div>         
+				<div class="save-item btn" data-table="publications" style="width:50%;">ENREGISTRER</div>                
+			</div>
+        </div>
+
+
+		<div id="category-panel" class="panel">
+			<div class="panel-header">
+				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+				<div>CATEGORIE</div>
+            </div>
+            
+			<div class="panel-content">
+                <div id="category-form" class="form">
+                    <div id="category-upload-container" style="display:none; margin-bottom:30px; background-color:#E8E8E8; text-align:center; padding:65px 0px; ">
+                        <img src="./images/camera-icon-gray.png" style="width:50px;"/>
+                    </div>
+
+                    <div id="category-image-container" class="relative-wrap" style="position:relative; width:100%; margin-bottom:30px;">
+                        <img id="category-image" src="./images/uploads/dejeuner1.jpg" style="width:100%;"/>
+                        <input id="category-image-name" class="image-name" type="hidden"/>
+                    </div>
+                    <div style="width:90%; display: inline-block; margin-bottom:200px;">
+                        <input data-id="id" type="hidden" />
+            
+                        <div class="gray">Nom de la catégorie</div>
+                        <input data-id="name" class="required" />
+
+
+                        <div class="gray">Sections</div>
+                        <select id="big-category-select" data-id="big_category" multiple style="width:100%; "></select>
+                    </div>
+                </div>
+			</div>
+
+            <div class="panel-footer">
+                <div class="error"></div>
+                <div class="btn delete-item" data-table="categories" style="width:40%;">SUPPRIMER</div>         
+                <div class="save-item btn" data-table="categories" style="width:50%;">ENREGISTRER</div>                
+            </div>
+        </div>
+
+
+		<div id="user-panel" class="panel">
+			<div class="panel-header">
+				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+				<div>Utilisateur</div>
+			</div>
+			<div class="panel-content">
+                <div id="user-form"  class="form" >
+                    <input data-id="id" type="hidden"/>
+
+                    <div class="gray">Nom et prénom</div>
+					<input data-id="name" class="required" />
+
+                    <div class="gray">N° de téléphone</div>
+					<input data-id="phone_number" class="required" />
+
+                    <div class="gray">Email</div>
+					<input data-id="email" class="required" />
+
+                    <div class="gray">Adresse</div>
+					<input data-id="address" class="required" />
+
+                    <div class="gray">Mot de passe</div>
+					<input data-id="password" class="required" type="password" />
+               </div>
+            </div>
+			<div class="panel-footer">
+				<div class="error"></div>
+				<div class="delete-item btn" data-table="users" style="width:40%;">SUPPRIMER</div>         
+				<div class="save-item btn" data-table="users" style="width:50%;">ENREGISTRER</div>                
+			</div>
+		</div>
+    
+    
+
+		<div id="product-panel" class="panel">
+			<div class="panel-header">
+				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+				<div>PRODUIT</div>
+			</div>
+			<div id="product-form" class="panel-content">
+				<div id="product-upload-container" style="display:none; margin-bottom:30px; background-color:#E8E8E8; text-align:center; padding:65px 0px; ">
+					<img src="./images/camera-icon-gray.png" style="width:50px;"/>
+				</div>
+	
+				<div id="product-image-container" class="relative-wrap" style="position:relative; width:100%; margin-bottom:30px;">
+					<img id="product-image" src="./images/dejeuner1.jpg" style="width:100%;"/>
+					<input id="product-image-name" class="image-name" type="hidden"/>
+				</div>
+                
+                <div  class="form" data-id="save-product">
+                    <input id="product-id" data-id="id" type="hidden"/>
+
+                    <div class="form-element">
+                        <div class="gray admin-btn">Fournisseur</div>
+                        <select id="product-supplier"  data-id="supplier_id" class="admin-btn">
+                        </select>
+                    </div>
+                    
+                    <div class="gray">Nom du produit</div>
+					<input id="product-name"  data-id="name" class="required" />
+
+					<div class="gray">type</div>
+                    <select id="product-type"  data-id="type">
+                        <option value="0" selected>Panier surprise</option>
+                        <option value="1">Produit unique</option>
+                    </select>
+               
+
+                    <div class="gray">Prix du produit</div>
+                    <input id="product-price"  data-id="price" type="number" class="required" />
+
+                    <div class="gray">Prix réel du produit</div>
+                    <input id="product-real_price"  data-id="real_price" type="number" class="required" />
+
+
+                    <div class="gray">Commission Antigaspi (%)</div>
+                    <input id="product-benefit"  data-id="benefit" type="number" class="required" />
+
+                    <div class="gray">Points de fidelité</div>
+                    <input id="product-points"  data-id="points" type="number" class="skip" value="0"/>
+              
+
+                    <div class="gray">Catégorie</div>
+                    <select id="product-category"  data-id="categories" multiple style="padding:0px; width:90%;">
+                  
+                    </select>
+
+                    <div class="gray">Disponibilité</div>
+                    <div class="disponibility">
+                        <div class="disponibility-btn main-color" data-action="minus">-</div>
+                        <div id="product-stock"  data-id="stock" class="disponibility-number">2</div>
+                        <div class="disponibility-btn main-color" data-action="plus">+</div>
+                    </div>
+
+                    <div class="gray" style="margin-top:10px;">Fin de l'offre</div>
+                    <input id="product-expiry"  data-id="expiry" type="date" class="required"/>
+
+                    <div class="gray">Présentation</div>
+                    <textarea id="product-description"  data-id="description" style="margin-bottom:300px;" class="required" rows="8">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt .</textarea>
+                </div>
+            </div>
+			<div class="panel-footer">
+				<div class="error"></div>
+				<div class="btn delete-item"  data-table="products"  style="width:40%;">SUPPRIMER</div>         
+				<div class="btn save-item"  data-table="products" style="width:50%;">ENREGISTRER</div>                
+			</div>
+		
+		</div>
+    
+    
+        <div id="supplier-panel" class="panel" >
+            <div class="panel-header">
+                <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+                <div>FOURNISSEUR</div>
+            </div>
+            <div class="panel-content center" style="height:98vh; padding-bottom:200px;">
+                <div class="form" data-id="supplier-save" style="display:inline-block; width:95%; margin-bottom: 30px;">
+                    <div id="supplier-logo-container" class="round-logo-container">
+                        <img  class="centered-absolute-image" src="./images/uploads/new-logo.png"/>
+                        <input id="supplier-logo-name" class="image-name" type="hidden" value="placeholder" />
+                    </div>
+                    <input data-id="id" type="hidden"/>
+                        
+                    <div class="gray">Nom du particulier ou de l'établissement</div>
+                    <input data-id="name" value="" class="required"/>
+
+                    <div class="gray">Adresse</div>
+                    <input data-id="address" value="" class="required"/>
+                    
+                    <div class="gray">Type</div>
+                    <select data-id="supplier_type" id="supplier-type-select">
+                        <option value="normal" selected>particulier</option>
+                        <option value="retailer">Commerçant</option>
+                    </select>
+                    
+                    <div class="gray">N° de téléphone</div>
+                    <input data-id="phone_number" value="" type="number" class="required"/>
+                    
+                    <div class="gray">Adresse e-mail</div>
+                    <input data-id="email" type="text" value="hani" class="required"/>
+                
+                    <div class="gray">Mot de passe</div>
+                    <input  id="supplier-password" data-id="password" type="password" value="hani"  class="required"/>
+                </div>
+
+              
+                <!-- <div id="copy-link" class="btn" style="margin-bottom:20px; width:90%;">Copier Lien</div> -->
+                <input id="supplier-link" style="opacity: 0;"/>
+
+             </div>
+             <div class="panel-footer">
+                <div class="error"></div>
+                <div class="btn delete-item" data-table="suppliers" style="width:40%;">Supprimer</div>
+                <div class="btn save-item" data-table="suppliers" style="width:50%;">ENREGISTRER</div>
+            </div>
+        </div>
+      
+	</div>
+    
+      
+    <div id="empty-panel" class="panel" >
+        <div class="panel-header main-color">
+            <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+            <div id="empty-panel-title"> VOS INFORMATIONS </div>
+        </div>
+        <div class="panel-content">
+
+        </div>
+        <div>
+        </div>
+    </div>
+	<input class="upload-image" type="file" accept="image/*"  style="display:none;"  />
+               
+    <script src="./js/general_functions.js"></script> 
+    <script>
+        console.log({GV});
+        
+        GV={...GV, base_url:'./', android:false, swipers:{}, functions:{}};    
+        $(document).ready(function(){
+            $('.header-button[data-name="orders"]').click();
+            $('.header-admin-name').text(GV.user.name);
+            // $('.header-admin-image img').attr({src: GV.user.content?.profile_pic});
+        });
+    </script>
+    <script src="./js/admin.js"></script> 
+
+</body>
+</html>

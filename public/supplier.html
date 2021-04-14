@@ -1,0 +1,302 @@
+<html lang="fr">
+<head>
+	<title>Fournisseur | ANTIGASPI</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="shortcut icon" href="./images/logo_gaspi_icon_radius.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/fr.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRzO-AIr4QKIoVd4LBfXWDsY7hKUuH7lc&v=3.exp&signed_in=true&libraries=places"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.9/css/select2.min.css" rel="stylesheet" />
+	<!-- <link href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css" rel="stylesheet" /> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.9/js/select2.min.js"></script>
+	
+    <link rel="stylesheet" type="text/css" href="./css/general.css">
+	<link rel="stylesheet" type="text/css" href="./css/index.css">    
+	
+</head>
+<body>
+	
+	<div id="supplier-header" class="header"> 
+		<!-- <div class="header-category header-button active-header-button" data-name="explore"> 
+			<div class="header-button-icon"><img src="./images/cart-icon-gray.png" style="height:32px;"/><img src="./images/food-icon-black.png" style="height:32px;"/></div>
+			<div>Explore</div>
+		</div> -->
+		<div class="header-category header-button active-header-button" data-name="carts"> 
+			<div class="header-button-icon"><img src="./images/cart-icon-gray.png" style="height:32px;"/><img src="./images/cart-icon-black.png" style="height:32px;"/></div>
+			<div>COMMANDES</div>
+		</div>
+		<div class="header-category header-button" data-name="products" > 
+			<div class="header-button-icon"><img src="./images/food-icon-gray.png" style="height:27px;"/><img src="./images/food-icon-black.png" style="height:27px;"/></div>
+			<div>PRODUITS</div>
+		</div>
+		<div class="header-category header-button my-switch" data-name="profile" > 
+			<div class="header-button-icon"><img src="./images/profile-icon-gray.png"/><img src="./images/profile-icon-black.png"/></div>
+			<div>PROFIL</div>
+		</div>
+	</div>
+	<div class="black-screen"></div>  
+
+	<div id="content">  
+		<div id="explore-page" class="page center" style="display:none;">
+            <div class="open-map website-header main-color">
+                <img style="height:30px;  margin-left: 10px;"  src="./images/location-icon.png"/>
+                <strong class="place-name">Adresse non spécifiée</strong>
+            </div>
+            <div id="open-categories" class="btn">Rafraîchir la liste</div>          
+            <div id="category-title" class="title">Touts les grossistes</div>                  
+            <div id="suppliers-container">
+
+            </div>
+		</div>
+
+		<div id="wholesellers-page" class="panel" style="text-align:left;" >
+           
+        </div>  
+
+		<div id="carts-page" class="page center" style="display:block;">
+			<div class="search my-switch">
+				<input placeholder="Rechercher" />
+				<div class="search-button"> <img src="./images/search-icon-green.png" /></div>
+			</div>
+			<div id="crm-carts-filter" style="width:100%;">
+				<div class="tab-button active-tab-button" data-value="0" style="padding:10px 0px;">EN COURS</div
+				><div class="tab-button"  data-value="1"  style="padding:10px 0px;">TERMINÉES</div>
+		
+			</div>
+			<div id="crm-carts-list">
+				<img src="./images/orange-loading.gif" width=40px/>
+			</div>
+		</div>
+
+		<div id="products-page" class="page center" >
+			<div class="top-header-title">
+				<div>MES PRODUITS</div>
+			</div>
+
+			<div id="products-filter" style="width:100%; margin-top: 64px;">
+				<div class="tab-button active-tab-button" data-value="products" style="padding:10px 0px;">Produits</div
+				><div class="tab-button"  data-value="baskets"  style="padding:10px 0px;">Paniers</div>
+			</div>
+			<div id="crm-products" style="margin-top:0px; margin-bottom:100px;">
+				<img src="./images/orange-loading.gif" width=40px/>
+			</div>
+		</div>
+
+		<!-- NEW BASKET -->
+		<div id="new-basket-panel" class="panel">
+			<div class="panel-header">
+				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+				<div class="panel-title">NOUVEAU PANIER</div>
+			</div>
+			<div class="panel-content">
+                
+                <div id="save-basket-form" class="form" data-id="save-basket">
+				     <input id="basket-id" type="hidden"/>
+
+                    <div class="gray">Nom du Panier</div>
+					<input id="basket-name" required />
+
+                    <div class="gray">Prix du Panier</div>
+					<input type="number" id="basket-price" required />
+
+                    <div class="gray">Type du Panier</div>
+					<select id="basket-type">
+						<option value=0>Panier normal</option>
+						<option value=1>Panier surprise</option>
+					</select>
+					
+                    <div class="gray">Quantité en stock</div>
+					<input type="number" id="basket-stock" required />
+
+                    <div class="gray">Date d'expiration du Panier</div>
+					<input id="basket-expiry" type="date"  required />
+
+					<div class="select-title">Ajoutez des produits au panier</div>
+
+					
+					<div id="basket-products">
+						<div class="gray" style="padding:25px 0px; text-align:center;">Ce panier est vide.</div>
+						<div id="add-products-to-basket" class="btn">Ajouter des produits</div>
+					</div>
+					
+					
+
+					<div id="delete-basket" class="btn " style="margin-top:50px; margin-bottom:150px; width:90%; padding:15px;  background:tomato;">
+						SUPPRIMER LE PANIER
+					</div>
+
+                </div>
+            </div>
+			<div class="panel-footer">
+				<div id="basket-save-error" class="error mb5"></div>
+				<div class="btn close-panel" style="width:40%;">Annuler</div>         
+				<div id="save-basket" class="btn"  style="width:50%;">ENREGISTRER</div>                
+			</div>
+		
+		</div>
+
+
+		<!-- ADDING A PRODCT TO A CART -->
+		<div id="add-products-to-basket-panel" class="panel">
+			<div class="panel-header">
+				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+				<div class="panel-title">AJOUTER DES PRODUITS AU PANIER</div>
+			</div>
+			<div class="panel-content" style="background-color: #f2f2f2;">
+
+				<div id="new-basket-product" class="btn mt20">Nouveau produit</div>
+				<div class="gray m10">Les produits crées d'ici seront liés à ce panier uniquement.</div>
+				<div id="product-selection-list">
+				</div>
+
+			</div>
+			<div class="panel-footer">
+				<div id="basket-save-error" class="error mb5"></div>
+				<div class="btn close-panel" style="width:40%;">Annuler</div>         
+				<div id="confirm-basket-products" class="btn"  style="width:50%;">ENREGISTRER</div>                
+			</div>
+		
+		</div>
+
+		<div id="product-form" class="panel">
+			<div class="panel-header">
+				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
+				<div>PRODUIT</div>
+			</div>
+			<div class="panel-content">
+				<div id="product-upload-container" style="display:none; margin-bottom:30px; background-color:#E8E8E8; text-align:center; padding:65px 0px; ">
+					<img src="./images/camera-icon-gray.png" style="width:50px;"/>
+				</div>
+	
+				<div id="product-image-container" class="relative-wrap" style="position:relative; width:100%; margin-bottom:30px;">
+					<img id="product-image" src="./images/dejeuner1.jpg" style="width:100%;"/>
+					<input id="product-image-name" class="image-name" type="hidden"/>
+				</div>
+                
+                <div  class="form" data-id="save-product">
+				     <input id="product-id" type="hidden"/>
+
+                    <div class="gray">Nom du produit</div>
+					<input id="product-name" class="required" />
+
+                    <div class="gray">Prix du produit</div>
+                    <input id="product-price" type="number" class="required" />
+
+                    <div class="gray">Prix réel du produit</div>
+                    <input id="product-real_price" type="number" class="required" />
+              
+
+                    <div class="gray">Catégorie</div>
+                    <select id="product-category" multiple style="padding:0px; width:90%;">
+                  
+                    </select>
+
+                    <div class="gray mt10">Disponibilité</div>
+                    <div class="disponibility">
+                        <div class="disponibility-btn main-color" data-action="minus">-</div>
+                        <div id="product-stock" class="disponibility-number">2</div>
+                        <div class="disponibility-btn main-color" data-action="plus">+</div>
+                    </div>
+
+                    <div class="gray mt15">Fin de l'offre</div>
+                    <input id="product-expiry" type="date" class="required"/>
+
+                    <div class="gray">Description</div>
+                    <textarea id="product-description" class="required" rows="8" placeholder="Votre description ici..."></textarea>
+
+					                    
+					<div class="gray" style="margin-top:10px;">Publier</div>
+					<div id="product-published" class="switch" data-value="0" style="margin-bottom:50px;"><div class="switch-ball"></div></div>
+                </div>
+            </div>
+			<div class="panel-footer">
+				<div id="product-save-error" class="error mb5"></div>
+				<div id="delete-product" class="btn" style="width:40%;background-color: #ff4c28;">SUPPRIMER</div>         
+				<div id="save-product" class="btn"  style="width:50%;">ENREGISTRER</div>                
+			</div>
+		
+		</div>
+		
+
+		<div id="profile-page" class="page center" style="position:relative;">
+			<div class="top-header-title">
+				<div>MON PROFIL</div>
+			</div>
+			<div id="supplier-logo-container" class="round-logo-container">
+				<img style="object-fit: scale-down;" class="centered-absolute-image" src="./images/camera-icon-gray.png"/>
+				<input id="supplier-logo-name" class="image-name" type="hidden" />
+			</div>
+		
+			<div id="crm-profile-form" class="form" data-id="save-profile">
+				<div class="gray">Nom de l'établissement</div>
+				<input id="profile-name" value="" class="required"/>
+
+				<div class="gray">Adresse de l'établissement</div>
+				<input id="profile-address" value="" class="required"/>
+				
+				<div class="gray">N° de téléphone</div>
+				<input id="profile-phone_number" value="" type="number" class="required"/>
+				
+				<div class="gray">E-mail</div>
+				<input id="profile-email" value="" class="required"/>
+				
+				<div class="gray">Mot de passe</div>
+				<input id="profile-password" value="" type="password" class="required"/>
+
+
+				<div class="gray">Points dé fidélité <br> (pour un repas gratuit)</div>
+				<div class="disponibility">
+					<div class="disponibility-btn main-color" data-action="minus">-</div>
+					<div id="profile-points" class="disponibility-number">8</div>
+					<div class="disponibility-btn main-color" data-action="plus">+</div>
+				</div>
+
+				
+			</div>
+			<div id="crm-profile-stats" style="margin-top:30px;">
+				
+					<div class="profile-stat">
+						<div class="profile-stat-icon"><img src="./images/purse-icon.png"/></div>
+						Vous avez gagné  <div class="bold main-color"> 0 DA </div>
+						
+					</div
+					><div class="profile-stat">
+						<div class="profile-stat-icon"><img src="./images/food-icon-red.png"/></div>
+						<div>Vous avez généré <div id="order-count" class="bold c-red5"></div></div>
+					</div>
+            </div>
+            
+           
+			
+			<div id="crm-profile-footer" style="margin-bottom:20px; margin-top:30px;">
+				<div id="save-profile-error" class="error mb5"></div>
+				<div id="save-profile" class="btn " style="width:80%; padding:15px;">ENREGISTRER</div>
+			</div>
+
+			 
+            <div id="supplier-disconnect" class="btn cancel">
+                DECONNEXION
+            </div>
+        </div>
+        
+	</div>
+	
+	<input class="upload-image" type="file" accept="image/*" capture style="display:none;"  />
+               
+    <script src="./js/general_functions.js"></script> 
+    <script>
+        GV = GV || {} ;    
+		GV={...GV, base_url:'/', android:false, swipers:{}, functions:{}};  
+		
+        $(document).ready(function(){});
+        
+    </script>
+    <script src="./js/suppliers.js"></script> 
+
+</body>
+</html>s
