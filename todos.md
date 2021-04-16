@@ -42,9 +42,9 @@ Fixed the map : display, location detection, marker ...etc
 
 
 ### Launch todos :
-- [ ] Qoffa Tab: 
-  - [ ] Qoffa-element carousel
-  - [ ] Qoffa info: Name(?), Price, number of products, savings/real_price(?), expiration date, supplier, type.
+- [x] Qoffa Tab: 
+  - [x] Qoffa-element carousel
+  - [x] Qoffa info: Name(?), Price, number of products, savings/real_price(?), expiration date, supplier, type.
 - [ ] ....
 
 

@@ -111,7 +111,7 @@ $(document).on('click','#reset-filters', function(){
 
 
 $(document).on('click','#save-map', function(){
-    // init_page("main");
+    search_for_products();
 });
 
 
@@ -873,18 +873,3 @@ async function save_order($button){
 $(document).on('click','#go-to-history', function(){
     init_page("history");
 });
-
-
-//////////////////////////////////////////////////////////////////
-//////////////////////      MAPS      ////////////////////////////
-//////////////////////////////////////////////////////////////////
-
-
-async function requestLocationPermission(){
-    if ("android" in window){ 
-        android.getLocationPermission();
-    }else{
-        let {state} = await navigator.permissions.query({name:"geolocation"});
-        if (state != "granted") alert("Please allow location access");
-    }
-}

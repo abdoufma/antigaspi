@@ -12,6 +12,13 @@
 	
     <link rel="stylesheet" type="text/css" href="./css/general.css">
 	<link rel="stylesheet" type="text/css" href="./css/index.css">    
+	<style>
+		.address-wrapper{
+			display: flex;
+			background-color: #f0f0f0;
+		}
+		.address-wrapper img{width: 50px;height: 50px; padding: 5px;margin: auto; background-color: #f4f5f7;}
+	</style>
 </head>
 <body>      
 	<script>
@@ -90,25 +97,10 @@
 		});
 
 
-        $(document).on('click','.back-to-login', function(){
-			$(this).closest('.frame').css('display','none');
-			$(this).closest('.frame').parent().find('.frame').eq(1).fadeIn();
-		});
-
-        $(document).on('click','#signup-btn', function(){
-			if(!check_signup_form()){return;}
-			fade_panel($('#terms-panel'));
-		});
-
-		
-		$(document).on('click','#confirm-signup', function(){
-			signup();
-		});
-
+		///////////////////  LOGIN  ////////////////////
 
         $(document).on('click','#login-btn', function(){
 			if(!check_login_form()){return;}
-
 			login($('#login-email').val(), $('#login-password').val(), $(this));
 		});
 
@@ -117,8 +109,24 @@
 			if(e.keyCode == 13){      $(this).closest('.frame').find('.main-btn').click();  }
 		});
     
+
+				
+		async function login(email, password, $button){
+			console.log({email, password});
+			try {
+				let {new_user} = await ajax2(GV.base_url+'login', {email, password});	
+				window.location.reload();
+				
+			} catch (err) {
+				console.log(err);
+				let {responseJSON} = err;
+				$('#login-error').html(responseJSON.error);
+				$('#reset-password-container').css({display:"block"});
+			}
+		}
+
 		function check_login_form(){
-			var res=true;
+			let res = true;
 			$('#login-form .required').each(function(){
 				if($(this).val() != ""){return true;}
 				$(this).css('border', '2px solid red');
@@ -127,11 +135,19 @@
 			return res;
 		}
 
+		///////////////////  SIGNUP  ////////////////////
+
+		$(document).on('click','#signup-btn', function(){
+			if(!check_signup_form()){return;}
+			fade_panel($('#terms-panel'));
+		});
+
 		async function signup(){
-			let user = {type : GV.table_name, content:{has_read:1}};
+			let user = {type : GV.table_name, content:{has_read:1, lati:GV.lati, longi:GV.longi}};
 			$('#signup-frame .form').find('input, textarea, select').each(function(){
 				user[$(this).data('id')]=$(this).val();
 			});
+			user.address = user.address.replace(/[^a-z0-9áéíóúñü \.,_-]/gim,"");
 			console.log({user});
 			user = new_user_format(user, ["phone_number", "pic", "points", "fb_id", "address", "supplier_type", "rcn"]);
 			let data = await ajax2(GV.base_url+'signup', {user:JSON.stringify(user), table_name:GV.table_name}, $('#confirm-signup'));
@@ -143,6 +159,7 @@
 			}	
 		}
 
+			
 		function new_user_format(user, old_columns){
 			if(user.content == null) user.content = {} ;
 			old_columns.forEach((v) => {
@@ -163,27 +180,48 @@
 				} 
 			})
 			let $email = $(".login-form [data-id='email']");
-			const reg = new RegExp(/\w+@\w+\.\w+/);
-			if(!reg.test($email.val()) || $email.val()){
+			const reg = new RegExp(/[a-zA-Z0-9\.\-_]+@[\w+\.\w]+\.\w+/);
+			if(!reg.test($email.val())){
 				$email.css("border","2px solid red");
 				res = false;
 			};
 			return res;
 		}
 
-		async function login(email, password, $button){
-			console.log({email, password});
+		
+		$(document).on('click','#confirm-signup', signup);
+		
+        $(document).on('click','.back-to-login', function(){
+			$(this).closest('.frame').css('display','none');
+			$(this).closest('.frame').parent().find('.frame').eq(1).fadeIn();
+		});
+
+
+		$(document).on('click','#locate-supplier', async function(e){
+			e.preventDefault();
 			try {
-				let {new_user} = await ajax2(GV.base_url+'login', {email, password});	
-				window.location.reload();
-				
+				await requestLocationPermission();
+				initialize_map($('#my-map'), 36.7573,2.8873, 16, false);
+				fade_panel($("#map-panel"), true);
 			} catch (err) {
 				console.log(err);
-				let {responseJSON} = err;
-				$('#login-error').html(responseJSON.error);
-				$('#reset-password-container').css({display:"block"});
+				alert("Could not locate this device, Please enable the location services");
 			}
-		}
+		});
+
+
+		$(document).on('click','#save-map', function(){
+			$("#supplier-address").val(GV.place_name);
+		});
+
+		
+		$(document).on('click','#map-position-btn', async function(){
+			const {lat, lng} = await getLocation();
+			GV.map.setCenter({lat, lng});
+			const place_name = await get_formatted_place_name(lat, lng);
+			console.log(place_name);
+			set_place_name(place_name);
+		});
 
 
 		function display_form(){
@@ -193,7 +231,11 @@
 					<input data-id="name" value="" class="required"/>
 
 					<div class="gray">Adresse de l'établissement</div>
-					<input data-id="address" value="" class="required"/>
+
+					<div class="address-wrapper">
+						<input id="supplier-address" data-id="address" value="" class="required"/>
+						<img id="locate-supplier" src="images/target-icon-green.png" />
+					</div>
 					
 					<div class="gray">N° de téléphone</div>
 					<input data-id="phone_number" value="" type="number" class="required"/>

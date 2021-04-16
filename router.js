@@ -5,7 +5,7 @@ const fn = require('./functions.js');
 const upload = require('./upload.js');
 const fetch = require('node-fetch');
 const moment = require('moment');
-const MAPS_API_KEY = 'AIzaSyA3kg7YWugGl1lTXmAmaBGPNhDW9pEh5bo';
+const {BASE_URL, MAPS_API_KEY} = require('./config');
 
 router.get(`/all`,  async (req, res, next) => {
 	const {code, lang} = req.query;
@@ -294,7 +294,7 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 			try {
 				const {sendEmail} = require('./mailer');
 				console.log("sending");
-				const link = encodeURI(`http://localhost/reset_password?email="${email}"&token=123456789`);
+				const link = encodeURI(`${BASE_URL}reset_password?email="${email}"&token=123456789`);
 				const html = `<h3>Cliquez sur le lien suivant pour réinitialiser votre mot de passe:<h3>
 								<b><a href="${link}">Réinitialiser</a></b>`;
 				result = await sendEmail({to:email, subject:"Password Reset", html });

@@ -178,7 +178,7 @@ $(document).on('click','.open-map', function(){
 });
 
 function set_place_name(address){
-    // GV.place_name = address;
+    GV.place_name = address;
     $('.place-name').text(address);
 }
 
@@ -207,7 +207,6 @@ function initialize_map($selector, latitude, longitude, zoom, is_clickable){
             GV.longi = event.latLng.lng();
             const formatted_address = await get_formatted_place_name(GV.lati, GV.longi);
             set_place_name(formatted_address);
-            search_for_products();
         });
     }
 
@@ -219,7 +218,7 @@ function initialize_map($selector, latitude, longitude, zoom, is_clickable){
         autocomplete.addListener('place_changed', function() {
           let place = autocomplete.getPlace();
           if (!place.geometry) {  return; }
-          set_place_name(place.formatted_address.replace(', Algérie','.').replace(', Algeria','.'));
+          set_place_name(place.formatted_address.replace(', Algérie','').replace(', Algeria',''));
           GV.lati = place.geometry.location.lat();
           GV.longi = place.geometry.location.lng();
        
@@ -227,15 +226,6 @@ function initialize_map($selector, latitude, longitude, zoom, is_clickable){
           marker.setVisible(true);
           map.setCenter(place.geometry.location);
             
-          search_for_products(() => {
-              $.each(GV.suppliers, (i, sup) => {
-                let marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(sup.content?.lati, sup.content?.longi),
-                    icon: { url: 'images/marker-icon-blue.png' },
-                    map
-                });
-              });
-          });
         });
     });
 }
@@ -265,6 +255,14 @@ function calculate_distance(lat1, lon1, lat2, lon2, unit) {
 }
 
 
+async function requestLocationPermission(){
+    if ("android" in window){ 
+        android.getLocationPermission();
+    }else{
+        let {state} = await navigator.permissions.query({name:"geolocation"});
+        if (state != "granted") alert("Please allow location access");
+    }
+}
 
 
 function getAddress (latitude, longitude) {

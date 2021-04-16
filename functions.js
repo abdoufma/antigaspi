@@ -167,6 +167,7 @@ fn.signup = async function (req, res){
 		return res.send({user});
 			
 	} catch (error) {
+		console.log(error);
 		return res.status(500).send({error:error.message});
 	}
 }
