@@ -12,19 +12,17 @@
 - [ ] Check Facebook login.
 - [ ] Remplacer RC input with photo.
 - [ ] Add sort parameters.
-- [ ] "We3lash nekhser ki ne9der nerba7" is the new slogan.
+- [ ] Move the editing of supplier info to a new panel
+- [ ] "We3lash Nekhser ki ne9der nerba7" is the new slogan.
 
 
 # Backend todos
 - [] Check product date default value.
-- [] Install moment.
-- [] Install googleapis + nodemailer.
-- [] Add gift icons.
 
 # Ask Aymen : 
 - [] show product prices in qoffa?
 
-Fixed the map : display, location detection, marker ...etc
+Apps to check Too good to go, phenix
 
 ### Urgent Android todos :
 - [ ] Save account to local storage.
@@ -36,9 +34,6 @@ Fixed the map : display, location detection, marker ...etc
 
 ### Supplier :
 - [ ] On product delete: Alert the user about baskets containing the product.
-- [x] Add surprise panier hint(icon)
-- [x] fix baskets with deleted products.
-- [x] show only relevant products onBasketClick.
 
 
 ### Launch todos :
@@ -84,16 +79,11 @@ Fixed the map : display, location detection, marker ...etc
 
 
 ### to add/fix :
-- [x] Compress images on upload
-- [x] Update product qty in product page
-- [x] Language select: AR/FR at signup
+- [ ] Compress images on upload
+- [ ] Système de points: par produit
 - [ ] Add app functionality to website
 - [ ] Give the user the option to take a photo on upload (see androïd side)
-- [ ] Fix the new-product photo showing in the supplier profile page
-- [ ] Système de points: par produit
-- [ ] Check supplier profile overwriting (lat, lng, token)
 - [ ] Notify actual admins (1/2)
-- [ ] Add "open map" button in product page.
 
 
 ### Questions to Asma:
@@ -102,8 +92,7 @@ Fixed the map : display, location detection, marker ...etc
   - At signup, only require documents from wholsellers? -> *YES*
   - How to display Qoffas user-side? -> *NO*
  
-   -On supplier signup : choose je suis un commerçant / partuculier -> 
-     choose catégory
+   -On supplier signup : choose je suis un commerçant / particulier -> choose catégory
     -Particulier : cp pièce d'identité + catégorie
     -Commerçant : copie du RC
 
@@ -113,11 +102,10 @@ Fixed the map : display, location detection, marker ...etc
 NEW LOGIC:
 
 
-suppliers 
-
-One supplier per order
-products from he same supplier are grouped together
+One supplier per order.
+products from he same supplier are grouped together.
 change order structure
+Add basket order
 
 
 

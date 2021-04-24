@@ -201,7 +201,7 @@
 			e.preventDefault();
 			try {
 				await requestLocationPermission();
-				initialize_map($('#my-map'), 36.7573,2.8873, 16, false);
+				initialize_map($('#my-map'), 36.7573,2.8873, 16, true);
 				fade_panel($("#map-panel"), true);
 			} catch (err) {
 				console.log(err);
@@ -216,6 +216,7 @@
 
 		
 		$(document).on('click','#map-position-btn', async function(){
+			// await requestLocationPermission();
 			const {lat, lng} = await getLocation();
 			GV.map.setCenter({lat, lng});
 			const place_name = await get_formatted_place_name(lat, lng);
