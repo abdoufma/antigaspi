@@ -5,7 +5,7 @@ module.exports = {
     dbConfig: {
         host:'antigaspi.dz',
         user:'devlog',
-        password:'TestingThis43?#@',
+        password:'TestingThis43?#@', 
         database:'antigaspi'
     },
     sessionConfig : {
