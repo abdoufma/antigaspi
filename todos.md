@@ -12,17 +12,18 @@
 - [ ] Check Facebook login.
 - [ ] Remplacer RC input with photo.
 - [ ] Add sort parameters.
-- [ ] Move the editing of supplier info to a new panel
+- [ ] Move the editing of supplier info to a new panel.
 - [ ] "We3lash Nekhser ki ne9der nerba7" is the new slogan.
 
 
 # Backend todos
-- [] Check product date default value.
+- [ ] Check product date default value.
+- [ ] Rename al_users table
 
 # Ask Aymen : 
 - [] show product prices in qoffa?
 
-Apps to check Too good to go, phenix
+Apps to check Too good: to go, phenix
 
 ### Urgent Android todos :
 - [ ] Save account to local storage.

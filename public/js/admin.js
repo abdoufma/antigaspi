@@ -310,7 +310,7 @@ $(document).on('click','.activation-btn', async function(){
     if(GV.suppliers[id].active == 0){active=1;}
 
     let item = {id, active}
-    let data = await ajax2( GV.base_url+'ajax/save_item', { item ,table:"all_users"}, $(this));
+    let data = await ajax2( GV.base_url+'ajax/save_item', { item ,table:"users"}, $(this));
     try{ GV.last_inserted_element = data[table][0].id;}catch(e){}
     index_items(data);
     $(`.active-header-button`).click();

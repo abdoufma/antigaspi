@@ -119,9 +119,12 @@
 					<div class="select-title">Ajoutez des produits au panier</div>
 
 					
-					<div id="basket-products">
-						<div class="gray" style="padding:25px 0px; text-align:center;">Ce panier est vide.</div>
-						<div id="add-products-to-basket" class="btn">Ajouter des produits</div>
+					<div class="basket-products-wrapper">
+						<div id="basket-products">
+							<div class="gray" style="padding:25px 0px; text-align:center;">Ce panier est vide.</div>
+						</div>
+						
+						<div id="add-products-to-basket" class="btn m5">Ajouter des produits</div>
 					</div>
 					
 					
@@ -134,14 +137,14 @@
             </div>
 			<div class="panel-footer">
 				<div id="basket-save-error" class="error mb5"></div>
-				<div class="btn close-panel" style="width:40%;">Annuler</div>         
+				<div class="btn close-panel" style="width:40%;">Retour</div>         
 				<div id="save-basket" class="btn"  style="width:50%;">ENREGISTRER</div>                
 			</div>
 		
 		</div>
 
 
-		<!-- ADDING A PRODCT TO A CART -->
+		<!-- ADDING A PRODUCT TO A CART -->
 		<div id="add-products-to-basket-panel" class="panel">
 			<div class="panel-header">
 				<div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
@@ -149,7 +152,7 @@
 			</div>
 			<div class="panel-content" style="background-color: #f2f2f2;">
 
-				<div id="new-basket-product" class="btn mt20">Nouveau produit</div>
+				<div id="new-basket-product" class="basket-product btn mt20">Nouveau produit</div>
 				<div class="gray m10">Les produits crées d'ici seront liés à ce panier uniquement.</div>
 				<div id="product-selection-list">
 				</div>
@@ -210,8 +213,8 @@
                     <textarea id="product-description" class="required" rows="8" placeholder="Votre description ici..."></textarea>
 
 					                    
-					<div class="gray" style="margin-top:10px;">Publier</div>
-					<div id="product-published" class="switch" data-value="0" style="margin-bottom:50px;"><div class="switch-ball"></div></div>
+					<div class="gray optional" style="margin-top:10px;">Publier</div>
+					<div id="product-published" class="switch optional" data-value="0" style="margin-bottom:50px;"><div class="switch-ball"></div></div>
                 </div>
             </div>
 			<div class="panel-footer">

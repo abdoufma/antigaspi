@@ -4,6 +4,7 @@ const {join} = require('path');
 const session = require('express-session');
 const router = require('./router');
 const {sessionConfig} = require('./config');
+const PORT = 80;
 
 
 const app = express();
@@ -15,4 +16,4 @@ app.use(express.static(join(__dirname,'public')));
 app.use(router);
 
 
-app.listen(80, () => console.log(`listenning on *:${80}`));
+app.listen(PORT, () => console.log(`listenning on *:${PORT}`));

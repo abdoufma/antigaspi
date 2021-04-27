@@ -15,13 +15,13 @@ router.get(`/all`,  async (req, res, next) => {
 			let bu = fn.get_bu(req);
 			fb_user = await fn.get_facebook_sdk_user(code, bu);
 			// if(fb_user == {} || fb_user == undefined){throw new Error(`BU: ${fb_user}`);}
-			let db_user = await db.select('*','all_users', {email:fb_user.email}, "row");
+			let db_user = await db.select('*','users', {email:fb_user.email}, "row");
 			let categories = await db.select('*','categories', {}, 'indexed');
 			if(db_user){
 				req.session.user_id = db_user.id;
 				fn.render(req, res, "main", {user:db_user, categories}, lang);
 			}else{
-				let {insertId} = await db.insert("all_users", {...fb_user, type:"user"});
+				let {insertId} = await db.insert("users", {...fb_user, type:"user"});
 				req.session.user_id = insertId;
 				fn.render(req, res, "main", {user:fb_user, categories}, lang);
 			}
@@ -29,7 +29,7 @@ router.get(`/all`,  async (req, res, next) => {
 
 		if(req.session.user_id){
 			let {user_id} = req.session;
-			let user = await db.select('*', "all_users", {id:user_id}, "row");
+			let user = await db.select('*', "users", {id:user_id}, "row");
 			if(user == undefined){return res.send("<h2>User not found<h2>")}
 			switch (user.type) {
 				case "user": fn.render(req, res, "main", {user, categories: await db.select('*','categories', {}, 'indexed')}, lang);  break;
@@ -114,14 +114,14 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 				result['categories'] = await db.select('*', 'categories');
 				result['products'] = await db.select('*', 'products',{supplier_id, deleted:0});
 				result['baskets'] = await db.select('*', 'baskets', {supplier_id, deleted:0});
-				result['suppliers'] = await db.select('*', 'all_users',{type: "supplier" ,deleted:0});
+				result['suppliers'] = await db.select('*', 'users',{type: "supplier" ,deleted:0});
 				result['orders'] = await db.select('*', 'orders', {supplier_id, deleted:0});
 				let users_ids = {};
 				db.foreach(result['orders'], function(i,v){
 					users_ids[v.user_id] = true;
 				})
 		
-				let users = await db.select('*', 'all_users', {type:"user"});
+				let users = await db.select('*', 'users', {type:"user"});
 				result['users'] = [];
 
 				users.forEach((u) => {
@@ -134,8 +134,8 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 				result['products'] = await db.select('*', 'products',{deleted:0});
 				result['orders'] = await db.select('*', 'orders',{deleted:0});
 				result['baskets'] = await db.select('*', 'baskets', {supplier_id, deleted:0});
-				result['users'] = await db.select('*', 'all_users',{type: "user" , deleted:0}, null, 100);
-				result['suppliers'] = await db.select('*', 'all_users',{type: "supplier" ,deleted:0});
+				result['users'] = await db.select('*', 'users',{type: "user" , deleted:0}, null, 100);
+				result['suppliers'] = await db.select('*', 'users',{type: "supplier" ,deleted:0});
 			}
 		}
 
@@ -154,12 +154,12 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 		if(func_name == 'save_user'){
 			let {item } = data;
 			if(!item.id){
-				let {insertId} = await db.insert("all_users", item);
+				let {insertId} = await db.insert("users", item);
 				item.id = insertId;
 			}else{
-				await db.update("all_users", item, {id:item.id});
+				await db.update("users", item, {id:item.id});
 			}
-			result["user"] = await db.select('*', "all_users", {id :item.id});
+			result["user"] = await db.select('*', "users", {id :item.id});
 		}
 
 
@@ -170,31 +170,31 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 
 		if(func_name == 'delete_user'){
 			let {id} = data
-			result["deleted"] = await db.update("all_users", {deleted:1, active: -1}, {id});
+			result["deleted"] = await db.update("users", {deleted:1, active: -1}, {id});
 		}
 
 		
 		if(func_name == 'update_user'){
 			let user = JSON.parse(data.user);
-			let res = await db.update('all_users', user, {id:user.id});
+			let res = await db.update('users', user, {id:user.id});
 			console.log({res});
 		}
 
 		if(func_name == 'save_token'){
 			let {id, token} = data
-			let user = await db.select('*', 'all_users', {id}, "row");
+			let user = await db.select('*', 'users', {id}, "row");
 			let content = JSON.parse(user.content) || {};
 			content.token = token;
-			result = await db.update('all_users', {content}, {id});
+			result = await db.update('users', {content}, {id});
 		}
 
 		
 		if(func_name == 'save_profile'){
 			let {supplier} = data;
 			let {id, content} = supplier;
-			let {content: db_content} = await db.select('content', "all_users", {id},"row");
+			let {content: db_content} = await db.select('content', "users", {id},"row");
 			supplier.content = {...JSON.parse(db_content), ...JSON.parse(content)};
-			await db.update('all_users', supplier, {id});
+			await db.update('users', supplier, {id});
 		}
 
 
@@ -206,7 +206,7 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 			}else{
 				await db.update("products", product, {id:product.id});
 			}
-			result = await db.select('*', "products", {id :product.id});
+			result = await db.select('*', "products", {id :product.id}, "row");
 		}
 		
 		if(func_name == 'save_basket'){
@@ -245,7 +245,7 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 			let product = await db.select('*','products',{id:order.product_id}, 'row');
 			let stock = parseInt(product.stock) - order.quantity;
 			await db.update('products', {stock}, {id:order.product_id});
-			let supplier = await db.select('*','all_users',{id:order.supplier_id}, 'row');
+			let supplier = await db.select('*','users',{id:order.supplier_id}, 'row');
 			result = await notifySupplier(order, product, supplier)
 		}
 
@@ -256,28 +256,30 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 
 
 		if(func_name == 'load_products'){
-			const db_suppliers = await db.select('*','all_users', {type:"supplier", deleted : 0, active: 1});
+			const db_suppliers = await db.select('*','users', {type:"supplier", deleted : 0, active: 1});
 			const db_products = await db.exec_query("SELECT * FROM products WHERE deleted = 0 AND published = 1 AND stock > 0  ORDER BY date DESC"); 
 			const products = [], suppliers = {};
-			let lati = parseFloat(data.lati);
-			let longi = parseFloat(data.longi);
+			const lati = parseFloat(data.lati);
+			const longi = parseFloat(data.longi);
 			
-			const range = 0.1; // ~ 9Km
+			const range = 0.05; // 0.1 =~ 9Km
 			for (const supplier of db_suppliers){
 				const content = JSON.parse(supplier.content);
-				let {lati:lat, longi:lng} = content || {};
-				if(!is_between(parseFloat(lat), lati -range, lati + range)) continue;
-				if(!is_between(parseFloat(lng), longi -range, longi + range)) continue;
-				suppliers[supplier.id] = supplier;
+				let {lati:supplier_lat, longi:supplier_lng} = content || {};
+				if(!is_between(parseFloat(supplier_lat), lati-range, lati + range)) continue;
+				if(!is_between(parseFloat(supplier_lng), longi-range, longi + range)) continue;
+				console.log(supplier.name);
+				const distance = Math.sqrt(Math.pow((supplier_lat-lati),2) + Math.pow((supplier_lng-longi),2));
+				suppliers[supplier.id] = {...supplier, distance};
 			};
 
 			for (const product of db_products){
 				if(suppliers[product.supplier_id] == undefined ) continue;
+				products.distance = suppliers[product.supplier_id].distance;
 				products.push(product);
 			};
 
 			result = {suppliers, products};
-
 
 		}
 
@@ -307,7 +309,7 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 		if(func_name == 'reset_password'){
 			const {email, password} = data;
 			try {
-				await db.update("all_users",{password},{email});
+				await db.update("users",{password},{email});
 				result["success"] = true;
 			} catch (error) {
 				console.error("Oh shi-");

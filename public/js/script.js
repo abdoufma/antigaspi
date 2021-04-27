@@ -3,7 +3,9 @@ GV.lati = 36.7574811;
 GV.place_name = "Adresse non spécifiée";
 GV.fcm_server_key = "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTVkpajocntBhu-8JioVd0K-_UjcpoFct0EdHYstgNJlJYpxSnxJ5WG8JdrP5MSdcBMvwD0bSa1Zbe_9EtMqABP5S0bt94B7v7L"
 GV.selected_big_category = undefined;
-GV.sort_dir = true;
+GV.sort_dir = "desc";
+GV.sort_option = "date";
+GV.suppliers = {}; GV.products = {}; GV.carts = {};
 
 
 $(document).on('click','.header-button',function(){
@@ -54,7 +56,7 @@ $(document).on('click','#logo',function(){
 
 
 GV.functions.main = async function(){
-    search_for_products();
+    load_products();
     display_categories(true);
 }
 
@@ -86,13 +88,26 @@ $(document).on('click','#filter-btn', function(){
 });
 
 $(document).on('click','#sort-btn', function(){
-    // fade_panel($('#filter-panel'),true);
+    fade_panel($("#sort-panel"), true);
+});
+
+$(document).on('click','.sort-direction', function(){
+    GV.sort_dir = $(this).data("value");
+    $(".sort-direction").removeClass("selected");
+    $(this).addClass("selected");
     sort_products();
 });
 
+$(document).on('click','.sort-option', function(){
+    GV.sort_option = $(this).data("value");
+    $(".sort-option").removeClass("selected");
+    $(this).addClass("selected");
+    sort_products();
+    fade_panel($('#sort-panel'), false);
+});
+
+
 function sort_products(){
-    GV.sort_dir = !GV.sort_dir;
-    GV.sort_dir ? $("#sort-btn img").addClass("flipped") : $("#sort-btn img").removeClass("flipped");
     display_products();
 }
 
@@ -100,41 +115,40 @@ $(document).on('click','.main-category', function(){
     fade_panel($('#main-categories-panel'),false);
     GV.selected_big_category = $(this).data('id').toString();
     $('#category-title').text(GV.categories[GV.selected_big_category].name).css('display','none').fadeIn();
-    search_for_products();
+    load_products();
 });
 
 $(document).on('click','#reset-filters', function(){
     GV.selected_big_category = undefined;
-    search_for_products();
+    load_products();
     fade_panel($('#main-categories-panel'),false);
 });
 
 
 $(document).on('click','#save-map', function(){
-    search_for_products();
+    load_products();
 });
 
 
-async function search_for_products(){
-    $('#products-container').html(loading_html());
+async function load_products(){
+    $('#products-area').html(loading_html());
     try{
-        let data = await ajax2(GV.base_url+'ajax/load_products', { lati:GV.lati, longi:GV.longi});
-        GV.products = {}; GV.suppliers = {}; GV.carts = {};
+        const {products, suppliers, carts} = await ajax2(GV.base_url+'ajax/load_products', { lati:GV.lati, longi:GV.longi});
         
-        $.each(data['products'], function(i,v){
-            try{v.categories = JSON.parse(v.categories); }catch(e){}
-            GV.products[v.id] = v;
-        });
-
-        $.each(data['suppliers'], (i,v) => GV.suppliers[v.id] = v); 
-        // $.each(data['carts'], (i,v) => GV.carts[v.id] = v); 
-
+        // index_items(products, "products");
+        GV.products = products;
+        GV.suppliers = suppliers;
+        GV.carts = carts;
+        // index_items(suppliers, "suppliers");
+        // index_items(carts, "carts");
+        console.log(suppliers);
         $('.loading-container').remove();
+        console.log(products);
         display_products();
     } catch(err){
         console.log(err);
         $('.loading-container').append('<div style="color:red">Une erreur s\'est produite</div>');
-        setTimeout(function(){ search_for_products()}, 2000);
+        setTimeout(function(){ load_products()}, 2000);
     }
 }
 
@@ -145,22 +159,21 @@ $(document).on('click','#specific-product-back', function(){
 
 
 function display_products(custom_products){
-    $('#products-container').html('');
     let html="";
 
     let products = Object.values(custom_products || GV.products);
-
+    
     if(GV.selected_big_category !== undefined){
-        products = products.filter( (e) => {
-            const big_cats = get_product_big_categories(e);
+        products = products.filter( (p) => {
+            const big_cats = get_product_big_categories(p);
             return big_cats.includes(GV.selected_big_category);
         });
     }
-    
-    if(GV.sort_dir){
-        products.sort((a, b) => moment(a.date).diff(b.date));
+
+    if(GV.sort_dir === "asc"){
+        products.sort((a, b) => moment(a[GV.sort_option]).diff(b[GV.sort_option]));
     }else{
-        products.sort((a, b) => moment(b.date).diff(a.date));
+        products.sort((a, b) => moment(b[GV.sort_option]).diff(a[GV.sort_option]));
     }
     
 
@@ -169,15 +182,14 @@ function display_products(custom_products){
         html += product_element_html(product);
     }
 
-    $('#products-area').css({display: "grid"});
-    if(html==""){html=no_element_html(); $('#products-area').css({display: "block"});}
+    if(html=="") html=no_element_html();
     
     $('#products-area').html(html);
 }
 
 const product_element_html = (product) =>`
     <div class="product-card" data-id="${product.id}">
-        <img src="images/uploads/${product.image}" alt="product.name">
+        <img src="images/uploads/${product.image}" alt="${product.name}">
         <div class="desc">
             <div class="name capitalize">${product.name}</div>
             <div class="gray crossed">${product.real_price}DA</div>
@@ -194,6 +206,7 @@ function get_product_big_categories(product){
 
 $(document).on('click','.product-card',async function () {
     GV.selected_product_id = $(this).data("id");
+    // console.log({selected_product_id:GV.selected_product_id});
     const product = GV.products[GV.selected_product_id];
     const supplier = GV.suppliers[product.supplier_id];
     fill_product_panel(product, supplier);
@@ -261,11 +274,6 @@ function fill_product_panel(product, supplier){
     $('.supplier-actions .open-google-maps').data({"lat": content.lati, "lng": content.longi});
 }
 
-function supplier_location_map(content){
-    let {lati, longi} = JSON.parse(supplier.content);
-    // if()
-    return ``;
-}
 
 
 $(document).on('click','.call-supplier', function(){
@@ -288,15 +296,29 @@ const open_gmaps_directions = (lat,lng) => window.location = `https://maps.googl
 //////////////////////////////////////////////////////////////////
 
 
-
-
 $("#search-products").on("change", async function(){
-    let key = $(this).val();
-    console.log(key);
-    const products = await ajax2("/ajax/search_products", {key});
+    $('#products-area').html(loading_html());
+    const key = $(this).val();
+    let products;
+    if(key !== "")
+        products = await ajax2("/ajax/search_products", {key});
+
+    index_items(products, "products");
+
     display_products(products);
 });
 
+function index_items(data, type){
+    if(!data) return;
+    $.each(data, function(i, item){
+        $.each(item, function(key, v){
+            if(isJsonString(v)) item[key] = JSON.parse(v);
+        })
+        GV[type][item.id] = item;
+    });
+}
+
+const isJsonString = (v) => (typeof(v) === "string" && (v.startsWith("[") || v.startsWith("(")));
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -307,7 +329,7 @@ $("#search-products").on("change", async function(){
 
 GV.functions.qoffas = async () => {
     await load_qoffas();
-    display_qoffas();
+    display_baskets();
 }
 
 async function load_qoffas(){
@@ -316,10 +338,11 @@ async function load_qoffas(){
     GV.baskets = baskets;
 }
 
-function display_qoffas(){
+function display_baskets(){
     let html = "";
     for (const basket of Object.values(GV.baskets)){
         const supplier = GV.suppliers[basket.supplier_id];
+        console.log(supplier);
         if(supplier == undefined) continue;
         html += (basket.type === 0) ? normal_qoffa_html(basket, supplier) : surprise_qoffa_html(basket, supplier);
     }
@@ -449,7 +472,7 @@ async function load_orders(){
 function display_header_history_count(){
     if(GV.orders == undefined){$('#history-notification').text(0).fadeOut(); return; }
     let count = GV.orders.findBy("status", 0).length;
-    if(count  == 0){
+    if(count == 0){
         $('#history-notification').text(0).fadeOut();
         return;
     }
@@ -466,6 +489,7 @@ function display_history(){
         let product = GV.products[order.product_id];
         if(product == undefined){return true;}
         let supplier = GV.suppliers[product.supplier_id];
+        if(!supplier) return;
         let {logo} = JSON.parse(supplier.content);
         let distance = calculate_distance(GV.lati, GV.longi, supplier.lati, supplier.longi, 'km');
         html[order.status]=`<div class="history-element" data-id="${order.id}">

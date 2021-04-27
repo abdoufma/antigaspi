@@ -85,20 +85,20 @@ fn.get_logged_user = async function(req){
 		return fb_user;
 	}
 	if((!req.session.user_id)) return null;
-	let user = await db.select('*', "all_users", {id:req.session.user_id}, "row");
+	let user = await db.select('*', "users", {id:req.session.user_id}, "row");
 	return user;
 }
 
 fn.fb_login = async function(req, user){
 	if(user == undefined){return false;}
-	let db_user = await db.select('*', "all_users", { email:user.email},'row');
+	let db_user = await db.select('*', "users", { email:user.email},'row');
 	console.log({found_in_db:db_user});
 	
 	if(db_user){
 		user = db_user;
 	}else{
-		let {insertId} = await db.insert("all_users", user);
-		user = await db.select('*', "all_users", {id:insertId},'row');
+		let {insertId} = await db.insert("users", user);
+		user = await db.select('*', "users", {id:insertId},'row');
 	}
 	
 	req.session.user_id = user.id;
@@ -145,7 +145,7 @@ fn.signup = async function (req, res){
 	let {user} = req.body;
 	try {
 		user = ( typeof(user) == "string" ) ? JSON.parse(user) : user;
-		let existing_user = await db.select('*', "all_users", {email:user.email}, 'row');
+		let existing_user = await db.select('*', "users", {email:user.email}, 'row');
 		
 		if(existing_user){
 			res.send({error:"Ce compte existe déjà."});
@@ -156,8 +156,8 @@ fn.signup = async function (req, res){
 				content.lati = 36.7532; content.longi = 3.06908;
 				user.content = JSON.stringify(content)
 			}
-			let {insertId} = await db.insert("all_users", user);
-			user = await db.select('*', "all_users", {id:insertId},'row');
+			let {insertId} = await db.insert("users", user);
+			user = await db.select('*', "users", {id:insertId},'row');
 			if(user.type == "supplier"){
 				notify_admin(user);
 			}
@@ -184,7 +184,7 @@ fn.signup = async function (req, res){
 fn.login = async function(req, res){
 	let {email, password} = req.body;		
 	try {
-		let user = await db.select('*', "all_users", {email, password}, 'row');	
+		let user = await db.select('*', "users", {email, password}, 'row');	
 		if(user){
 			if(user.active === -1){
 				res.status(403).send({error:"Ce Compte à été banni par l'administateur du site."});
@@ -228,7 +228,7 @@ fn.send_notification = function(title, body, token, image){
 }
 
 async function notify_admin(user){
-	const admin = await db.select("*","all_users", {type:"admin"},"row");
+	const admin = await db.select("*","users", {type:"admin"},"row");
 	const {token} = JSON.parse(admin.content);
 	let title = "Un nouveau fournisseur vient de rejoindre Antigaspi";
 	let body = `${user.name} vient de rejoindre Antigaspi`;

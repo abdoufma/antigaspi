@@ -51,29 +51,19 @@ $(document).on('click','#black-screen', function(){
 });
 
 
-function fade_panel($selector, boolean){
-    var $empty_panel=$('#empty-panel');
-    var $empty_panel=$selector;
-    if($selector.attr('id')  == "navigation-panel"){ $empty_panel=$('#empty-nav-panel');} 
-    $empty_panel.find('#empty-panel-title').text($selector.find('.panel-header').text());
-
-    if(boolean === false){
-        $empty_panel.addClass('panel-slide-out').css('display','inline-block');
-        setTimeout(function(){
-        $selector.css('display','none');
-      },200)  
-        setTimeout(function(){   $empty_panel.css('display','none')  },200);
-        $selector.removeClass('active-panel');
-        if($('.active-panel').length == 0){
-            $('#black-screen').fadeOut();
-        }
-        return;
+function fade_panel($panel, show){
+    if(show === false){
+        $panel.addClass('panel-slide-out').css('display','inline-block');
+        setTimeout(() => $panel.css('display','none'), 200);
+        $panel.removeClass('active-panel');
+        if($('.active-panel').length == 0) $('#black-screen').fadeOut();
+    }else{
+        $panel.removeClass('panel-slide-out');
+        $panel.addClass(['active-panel', 'panel-slide-in']).css('display','inline-block');
+        $panel.find(".panel-content")[0].scrollTo(0,0);
+        setTimeout(function(){$panel.css('display','inline-block');}, 200);
+        $('#black-screen').fadeIn(); 
     }
-    $empty_panel.removeClass('panel-slide-out');
-    $empty_panel.addClass('panel-slide-in').css('display','inline-block');
-    $selector.addClass('active-panel');
-    setTimeout(function(){$empty_panel.css('display','none'); $selector.css('display','inline-block');}, 200);
-    $('#black-screen').fadeIn(); 
 }
 
 
@@ -156,7 +146,7 @@ function carousel(selector,passed_options, callback){
 
 
 function loading_html(){
-    return `<div class="loading-container" ><img src="${GV.base_url}images/orange-loading.gif"/></div>`;
+    return `<div class="loading-container col-span2" ><img src="${GV.base_url}images/orange-loading.gif"/></div>`;
 }
 
 
@@ -319,7 +309,7 @@ function getLocation() {
 
 
 function no_element_html(){
-    return `<div class="gray" style="padding:40px 0px; text-align:center;">Aucun élément trouvé</div>`;
+    return `<div class="gray col-span2" style="padding:40px 0px; text-align:center;">Aucun élément trouvé</div>`;
 }
 
 

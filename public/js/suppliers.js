@@ -290,13 +290,16 @@ function get_product_categories(product){
 
 
 $(document).on('click','#new-product', function(){
+    GV.basket_product = false;
     reset_product_form();
+    $(".optional").show();
 });
 
 function reset_product_form(){
     $('#product-form input').val('');
     $('#product-image-name').val('');
-
+    $('#product-description').val('');
+    set_switch(0);
     $('#product-stock').text('0');
     $('#product-image-container').css('display','none');
     $('#product-upload-container').css('display','block');
@@ -321,7 +324,7 @@ function display_basket_panel(id){
     if (id){
         const basket = GV.baskets[id];
         const products = basket.products;
-        fill_basket_product_select(products,  $("#basket-products"));
+        show_basket_products(products);
         $("#new-basket-panel .select-title").text("Contenu du panier:");
         $("#new-basket-panel .panel-title").text("MODIFIER LE PANIER");
         $("#basket-id").val(id);
@@ -331,10 +334,12 @@ function display_basket_panel(id){
         $("#basket-stock").val(basket.stock);
         $("#basket-expiry").val(moment(basket.expiry).format("YYYY-MM-DD"))
         $("#delete-basket").show();
+        fill_product_selection_list(products);
     }else{
         $("#save-basket-form input").each((_, i) => $(i).val(""));
-        $("#basket-products").html(`<div class="gray" style="padding:25px 0px; text-align:center;">Ce panier est vide.</div><div id="add-products-to-basket" class="btn">Ajouter des produits</div>`)
+        $("#basket-products").html(`<div class="gray" style="padding:25px 0px; text-align:center;">Ce panier est vide.</div>`);
         $("#delete-basket").hide();
+        fill_product_selection_list();
     }
     fade_panel($('#new-basket-panel'), true);
 }
@@ -352,25 +357,56 @@ function fill_basket_product_select(products, $selector){
     for (let pro of pros){
         if(pro.stock <1 ) continue;
         if (pro === undefined){
-            html += `<div class="deleted-product"><div class="product-info">[Produit supprimé]</div></div>`  
+            html += deleted_product();
         }else{
-            html += `
-                <div class="selectable-product" data-id="${pro.id}">
-                    <div class="product-image"><img src="./images/uploads/${pro.image}" alt="${pro.name}"></div>
-                    <div class="product-info">
-                        <div class="size14">${pro.stock} en stock </br> </div>
-                        <div class="bold size18">${pro.name} </div>
-                            <div class="size14">Expire le ${moment(pro.expiry).format("DD MMM")}</div>
-                    </div>
-	                <img src="images/tick.svg" style="width:25px;">
-                </div>`
+            html += product_element(pro);
         }
     }
     $selector.html(html);
 }
 
+
+function fill_product_selection_list(current_basket_products=[]){
+    let html = '', products = Object.values(GV.products);
+    console.log({current_basket_products});
+    for (const pro of products){
+        console.log({id:pro.id});
+        if(pro.stock < 1) continue;
+        let selected = current_basket_products.includes(pro.id);
+        html += (pro === undefined) ? deleted_product() : product_element(pro, selected);   
+    }
+    $("#product-selection-list").html(html);
+}
+
+function show_basket_products(products){
+    console.log(products);
+    let html = '', pros = products.map(e => GV.products[e]);
+    for (const pro of pros){
+        if(pro.stock < 1) continue;
+        html += (pro === undefined) ? deleted_product() : product_element(pro);   
+    }
+    $("#basket-products").html(html);
+}
+
+
+
+const product_element = (product, selected) => 
+    `<div class="selectable-product ${selected ? "selected-product" : ""}" data-id="${product.id}">
+        <div class="product-image"><img src="./images/uploads/${product.image}" alt="${product.name}"></div>
+        <div class="product-info">
+            <div class="size14">${product.stock} en stock </br> </div>
+            <div class="bold size18">${product.name} </div>
+                <div class="size14">Expire le ${moment(product.expiry).format("DD MMM")}</div>
+        </div>
+        <img src="images/tick.svg" style="width:25px;">
+    </div>`;
+
+
+const deleted_product = () => `<div class="deleted-product"><div class="product-info">[Produit supprimé]</div></div>`;
+
+
+
 $(document).on('click','#add-products-to-basket', function(){
-    fill_basket_product_select();
     fade_panel($("#add-products-to-basket-panel"), true);
 });
 
@@ -379,9 +415,8 @@ $(document).on('click','#confirm-basket-products', function(){
     $("#product-selection-list .selected-product").each(function(e) {
         basket_products.push($(this).data("id"));
     });
-    console.log(basket_products);
-    fill_basket_product_select(basket_products, $("#basket-products"));
-    // $("#basket-products").html('');
+    
+    show_basket_products(basket_products);
     fade_panel($("#add-products-to-basket-panel"), false);
 });
 
@@ -391,6 +426,8 @@ $(document).on('click','.selectable-product', function(){
 
 $(document).on('click','#new-basket-product', function(){
     reset_product_form();
+    GV.basket_product = true;
+    $(".optional").hide();
 });
 
 
@@ -439,18 +476,16 @@ function check_basket(){
     const expiry = $("#basket-expiry").val();
     const products = $("#basket-products .selectable-product").length;
     let error, valid = true;
-    console.log("hello errors");
     if(!name) {error="Veuillez ajouter un nom pour le panier"; valid=false;}
     if(!price) {error="Veuillez sélectionner le prix du panier"; valid=false;}
     if(!qty) {error="Veuillez ajouter le stock du panier"; valid=false;}
     if(!expiry) {error="Veuillez sélectionner une date d'expiration pour le panier"; valid=false;}
     if(products == 0) {error="Veuillez ajouter des produits au panier"; valid=false;}
-    console.log("no errors");
     return {error, valid};
 }
 
 $(document).on('click','#delete-basket', function(){
-    confirm_action('Voulez-vous vraiment supprimer ce panier ?', async function(){
+    confirm_action('Êtes-vous sûr de vouloir supprimer ce panier ?', async function(){
         if($('#basket-id').val() ==""){return; }
         let id = $('#basket-id').val();
         try {
@@ -475,9 +510,7 @@ $(document).on('click','#products-page .product-element', function(){
     $('#product-id').val(product.id);
     $.each(product, (i,v) => $('#product-'+i).val(v));
 
-    const status = product.published;
-    status ? $('#product-published').addClass("on") : $('#product-published').removeClass("on");
-    $('#product-published').data("value", status),
+    set_switch(product.published);
     $('#product-stock').text(product.stock);
     $('#product-expiry').val(moment(product.expiry).format('YYYY-MM-DD'));
     display_categories_select();
@@ -490,6 +523,11 @@ $(document).on('click','#products-page .product-element', function(){
     $('#product-upload-container').css('display','none');
     fade_panel($('#product-form'), true);
 });
+
+function set_switch(val){
+    val ? $('#product-published').addClass("on") : $('#product-published').removeClass("on");
+    $('#product-published').data("value", val);
+}
 
 
 
@@ -576,6 +614,10 @@ $(document).on('click','#save-product', async function(){
         let res = await ajax2(GV.base_url+'ajax/save_product', {product});
         console.log(res);
         GV.products[res.id] = res;
+        if(GV.basket_product){
+            console.log(GV.products[res.id]);
+            fill_product_selection_list();
+        }
         fade_panel($('#product-form'), false);
         $('.header-button[data-name="products"]').click();
     } catch (err) {
@@ -586,7 +628,7 @@ $(document).on('click','#save-product', async function(){
 
 
 $(document).on('click','#delete-product', function(){
-    confirm_action('Voulez-vous vraiment supprimer ce produit? Cette operation suprimera aussi tous les paniers contentant ce produit.', async function(){
+    confirm_action('Êtes-vous sûr de vouloir supprimer ce produit? Cette operation suprimera aussi tous les paniers contentant ce produit.', async function(){
         if($('#product-id').val() ==""){return; }
         let id = parseInt($('#product-id').val());
         try {
@@ -699,8 +741,9 @@ $(document).on('click','#save-profile', async function(){
 
 
 $(document).on('click', '#supplier-disconnect', function(){
-    confirm_action('Voulez-vous vraiment vous déconnecter ?', async() => {
-        const lang = window.localStorage?.lang;
-        window.location.replace(`disconnect?lang=${lang||"fr"}`);
+    confirm_action('Êtes-vous sûr de vouloir vous déconnecter ?', () => {
+        // if(window.localStorage)
+        // const lang = window.localStorage?.lang || "fr";
+        window.location.replace('disconnect?lang=fr');
     });
 });

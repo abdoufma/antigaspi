@@ -1,6 +1,17 @@
 {
-  "name": "nodeapp",
+  "name": "Antigaspi",
+  "version": "1.0.0",
+  "description": "antgiaspi.dz Codebase",
   "main": "app.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon app.js --ignore public/*"
+  },
+  "author": {
+    "email": "benbada.abdesslam@devlog.dz",
+    "name": "Abdou Benbada"
+  },
+  "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
     "express-session": "^1.16.2",
@@ -12,10 +23,6 @@
     "nodemailer": "^6.4.14",
     "request": "^2.88.2",
     "sharp": "^0.26.2"
-  },
-  "scripts": {
-    "start": "node .",
-    "dev": "nodemon app.js --ignore public/*"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.8",
