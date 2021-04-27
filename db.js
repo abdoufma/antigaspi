@@ -1,7 +1,8 @@
 const mysql = require('mysql');
+const {dbConfig} = require('./config');
 
 // const db = mysql.createConnection({    host:'antigaspi.dz',    user:'devlog',    password:'TestingThis43?#@',    database:'antigaspi'   });
-const db = mysql.createConnection({    host:'localhost',    user:'root',    password:'',   database:'antigaspi'});
+const db = mysql.createConnection(dbConfig);
 
 db.connect((err)=>{   if(err){console.log(err); return;}   });
 

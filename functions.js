@@ -193,7 +193,7 @@ fn.login = async function(req, res){
 				res.send({user});	
 			}
 		}else{
-			res.status(400).send({error:"identifiants invalides."});
+			res.status(400).send({error:"Identifiants invalides."});
 		}
 	} catch (err) {
 			console.error(err);
