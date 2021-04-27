@@ -45,6 +45,15 @@ router.get(`/all`,  async (req, res, next) => {
 	}
 });
 
+router.get(`/test/:id`, async (req, res) => {
+	try {
+		const {id} = req.params
+		res.send(await db.select('*', "users", {id}));
+	} catch (err) {
+		res.status(500).send({error:err.message});
+	}
+})
+
 
 router.get(`/maps`,  async (req, res, next) => {
 	const {lat, lng} = req.query;
