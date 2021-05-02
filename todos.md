@@ -8,17 +8,23 @@
 - [x] Fix disconnect not working
 - [x] Make sort work.
 - [x] Vérifier le message de confirmation.
+- [x] Add sort parameters.
+- [x] Clean up the landing page
+- [ ] Add Like/rate product on order complete.
 - [ ] Finish the surprise baskets page.
-- [ ] Check Facebook login.
 - [ ] Remplacer RC input with photo.
-- [ ] Add sort parameters.
 - [ ] Move the editing of supplier info to a new panel.
 - [ ] "We3lash Nekhser ki ne9der nerba7" is the new slogan.
+- [ ] Check the loading/filtering logic (extend or overwrite GV.products? or load related items as needed?)
+- [ ] Check Facebook login.
+- [ ] Revamp the orders page
+  - [x] Separate orders into tabs (by status) (or "Mon panier" & "historique")
+  - [ ] On "mon panier" page: add Checkout button -> order success panel.
+  - [ ] On "Suivre panier" -> order details panel with supplier actions.
 
 
 # Backend todos
-- [ ] Check product date default value.
-- [ ] Rename al_users table
+- [ ] 
 
 # Ask Aymen : 
 - [] show product prices in qoffa?
@@ -105,8 +111,8 @@ NEW LOGIC:
 
 One supplier per order.
 products from he same supplier are grouped together.
-change order structure
-Add basket order
+change order structure.
+Add basket order.
 
 
 

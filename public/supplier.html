@@ -59,14 +59,15 @@
         </div>  
 
 		<div id="carts-page" class="page center" style="display:block;">
-			<div class="search my-switch">
-				<input placeholder="Rechercher" />
-				<div class="search-button"> <img src="./images/search-icon-green.png" /></div>
-			</div>
-			<div id="crm-carts-filter" style="width:100%;">
-				<div class="tab-button active-tab-button" data-value="0" style="padding:10px 0px;">EN COURS</div
-				><div class="tab-button"  data-value="1"  style="padding:10px 0px;">TERMINÉES</div>
-		
+			<div id="carts-page-header">
+				<div class="search">
+					<input placeholder="Rechercher" />
+					<div class="search-button"> <img src="./images/search-icon-green.png" /></div>
+				</div>
+				<div id="crm-carts-filter" style="width:100%;">
+					<div class="tab-button active-tab-button" data-value="0" style="padding:10px 0px;">EN COURS</div
+					><div class="tab-button"  data-value="1"  style="padding:10px 0px;">TERMINÉES</div>
+				</div>
 			</div>
 			<div id="crm-carts-list">
 				<img src="./images/orange-loading.gif" width=40px/>
@@ -75,14 +76,13 @@
 
 		<div id="products-page" class="page center" >
 			<div class="top-header-title">
-				<div>MES PRODUITS</div>
+				<div id="products-filter" style="width:100%;">
+					<div class="tab-button active-tab-button" data-value="products" style="padding:10px 0px;">Produits</div
+					><div class="tab-button"  data-value="baskets"  style="padding:10px 0px;">Paniers</div>
+				</div>
 			</div>
 
-			<div id="products-filter" style="width:100%; margin-top: 64px;">
-				<div class="tab-button active-tab-button" data-value="products" style="padding:10px 0px;">Produits</div
-				><div class="tab-button"  data-value="baskets"  style="padding:10px 0px;">Paniers</div>
-			</div>
-			<div id="crm-products" style="margin-top:0px; margin-bottom:100px;">
+			<div id="crm-products" style="margin-top:90px; margin-bottom:100px;">
 				<img src="./images/orange-loading.gif" width=40px/>
 			</div>
 		</div>

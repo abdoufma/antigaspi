@@ -5,7 +5,7 @@ GV.fcm_server_key = "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTVkpa
 GV.selected_big_category = undefined;
 GV.sort_dir = "desc";
 GV.sort_option = "date";
-GV.suppliers = {}; GV.products = {}; GV.carts = {};
+GV.suppliers = {}; GV.products = []; GV.indexed_products = {}; GV.carts = {};
 
 
 $(document).on('click','.header-button',function(){
@@ -31,9 +31,9 @@ function init_page(name){
 
 $(document).on('click','#map-position-btn', async function(){
     await requestLocationPermission();
-    console.log("getting user location");
     const {lat, lng} = await getLocation();
     console.log("Got em: ", lat, lng);
+    GV.lati = lat; GV.longi = lng;
     GV.map.setCenter({lat, lng});
     const place_name = await get_formatted_place_name(lat, lng);
     console.log(place_name);
@@ -136,6 +136,7 @@ async function load_products(){
         const {products, suppliers, carts} = await ajax2(GV.base_url+'ajax/load_products', { lati:GV.lati, longi:GV.longi});
         
         // index_items(products, "products");
+        index(products);
         GV.products = products;
         GV.suppliers = suppliers;
         GV.carts = carts;
@@ -157,6 +158,10 @@ $(document).on('click','#specific-product-back', function(){
     init_page("main");
 });
 
+
+function index(products){
+    for (const p of products) GV.indexed_products[p.id] = p;
+}
 
 function display_products(custom_products){
     let html="";
@@ -207,7 +212,8 @@ function get_product_big_categories(product){
 $(document).on('click','.product-card',async function () {
     GV.selected_product_id = $(this).data("id");
     // console.log({selected_product_id:GV.selected_product_id});
-    const product = GV.products[GV.selected_product_id];
+    // const product = GV.products[GV.selected_product_id];
+    const product = GV.indexed_products[GV.selected_product_id];
     const supplier = GV.suppliers[product.supplier_id];
     fill_product_panel(product, supplier);
     let {lati, longi} = JSON.parse(supplier.content);
@@ -396,7 +402,7 @@ function get_qoffa_items(items, surprise=false){
     console.log(items)
     let html = "";
     for (id of items){
-        const product = GV.products[id];
+        const product = GV.indexed_products[id];
         if(!product) continue;
         html += surprise ? 
             `<div class="qoffa-item suprise-qoffa-item swiper-slide flex col center">
@@ -450,9 +456,17 @@ $(document).on('click','.qoffa-element', async function(){
 /////////////////////////////////////////////////////////////////////////
 
 GV.functions.history=function(){
-    $('#history-category0').html(loading_html());
+    $('#order-history').html(loading_html());
     load_orders();
 }
+
+$(document).on('click','#orders-filter .tab-button', function () {
+    $('.tab-content').removeClass("active-tab-content");
+    const tab = $(this).data("value");
+    console.log(tab);
+    $(".confirm-container").css({display: tab ? "none" : "block"})
+    $(`.tab-content[data-tab="${tab}"]`).addClass("active-tab-content");
+});
 
 async function load_orders(){
     try {
@@ -483,81 +497,99 @@ function display_header_history_count(){
 function display_history(){  
     $('.history-category').html('');
     let savings = 0;
-    let html = {0:"", 1:"",2:""};
+    let html = "", current_basket = "";
     $.each(GV.orders, function(_, order){
-        if(order.user_id != GV.user.id ){return true;}
-        let product = GV.products[order.product_id];
+        let product = GV.indexed_products[order.product_id];
         if(product == undefined){return true;}
         let supplier = GV.suppliers[product.supplier_id];
         if(!supplier) return;
-        let {logo} = JSON.parse(supplier.content);
-        let distance = calculate_distance(GV.lati, GV.longi, supplier.lati, supplier.longi, 'km');
-        html[order.status]=`<div class="history-element" data-id="${order.id}">
-                    <div class="history-image">
-                        <img src="${GV.base_url}images/uploads/${product.image}"/>
-                    </div>
-                    <div class="padding15">
-                        <div class="history-logo-container">
-                            <img class="history-logo centered-absolute-image" src="${GV.base_url}images/uploads/${logo || "profile.png"}"/>
-                        </div>
-                        <div class="bold" style="text-transform:capitalize;">${product.name} (x${order.quantity})</div>
-                        <div class="history-element-title bold" style="color:black;">${supplier.name}</div>
-                        <div class="history-element-code">CODE <strong>AGX257</strong></div>
-                        <div class="history-price main-color" >
-                            <span style="margin-right:15px; "><strong >${calculate_price(product, order.quantity)}</strong> DA</span>
-                            <span style=" color:#ADADAD; text-decoration: line-through; ">${calculate_real_price(product, order.quantity)} DA</span>
-                        </div>
-                        <div class="history-date" style="margin-top:5px;">
-                            <img src="${GV.base_url}images/time-icon-orange.png" style="width:23px; margin-right:10px; "/>                               
-                            <div>10:30 - 12:30</div>
-                        </div>
-                        <div class="history-distance" style="margin-top:5px;">
-                            <img src="${GV.base_url}images/location-icon-orange.png" style="width:20px; margin-right:12px;"/>
-                            <div style="padding-top:3px;">À ${distance} km</div>
-                        </div>
-                        <div class="history-complete-date gray">${moment(order.date).format('LL HH:mm')}</div>
-                        <div class="center" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
-                            <div class="delete-order btn red-background" style="margin:0px;">Annuler</div>
-                            <div class="change-order-status btn" data-status="1" style="margin:0px;">RÉCUPÉRÉ</div>
-                        </div>
-                    </div>
-            </div>${html[order.status]}`;
+        if(order.status == "1"){
+            html = old_order_element(order, product, supplier) + html;
+        }else{
+            current_basket += basket_element(order, product, supplier);
+        }
         if(order.status == 1){savings+=(product.real_price - product.price);}
-
     });
 
-    $.each(html, function(status, local_html){
-        if(local_html == ""){local_html='<div class="gray" style="padding:30px 0px; text-align:center; border-bottom:1px solid #E8E8E8;">Aucun élément à Afficher</div>';}
-        $('#history-category'+status).html(local_html);
-    });
-
-
+    if (html == "") html = no_element_html();
+    if (current_basket == "") current_basket = `<div class="gray" style="padding:25px 0px; text-align:center;">Votre panier est vide. Ajoutez-y des produits </br> pour pouvoir passer une commande.</div>`;
     
+    $('#order-history').html(html);
+    $('#current-basket').html(current_basket);
     $('#history-savings').html(`<strong>${savings}</strong> DA Economisés`);
 }
 
 
+function basket_element(order, product, supplier){
+    const {address} = JSON.parse(supplier.content);
+    return `<div class="product-element" data-id="${order.id}">
+                <div class="product-element-left">
+                    <img class="" src="${GV.base_url}images/uploads/${product.image || "product.png"}"/>
+                </div
+                ><div class="product-element-right">
+                    <div class="bold">${supplier.name}</div>
+                    <div>${address || "Adresse non spécifiée"}</div>
+                    <div class="gray mt5">${moment(order.date).fromNow()}</div>
+                    <div class="bold main-color" style="margin-top:15px;">${order.code}</div>
+                    <div class="flex row gap10 mt15 center" >
+                        <div class="delete-order btn red-background" style="padding:10px">Annuler</div>
+                        <div class="change-order-status btn" data-status="1" style="padding:10px;">RÉCUPÉRÉ</div>
+                    </div>
+                    
+                </div>
+            </div>`;
+}
+
+function old_order_element(order, product, supplier){
+    const {logo} = JSON.parse(supplier.content);
+    return `<div class="history-element" data-id="${order.id}">
+                <div class="history-image">
+                    <img src="${GV.base_url}images/uploads/${product.image}"/>
+                </div>
+                <div class="padding15">
+                    <div class="history-logo-container">
+                        <img class="history-logo centered-absolute-image" src="${GV.base_url}images/uploads/${logo || "profile.png"}"/>
+                    </div>
+                    <div class="bold" style="text-transform:capitalize;">${product.name} (x${order.quantity})</div>
+                    <div class="history-element-title bold" style="color:black;">${supplier.name}</div>
+                    <div class="history-element-code">CODE <strong>AGX257</strong></div>
+                    <div class="history-price main-color" >
+                        <span style="margin-right:15px; "><strong >${calculate_price(product, order.quantity)}</strong> DA</span>
+                        <span style=" color:#ADADAD; text-decoration: line-through; ">${calculate_real_price(product, order.quantity)} DA</span>
+                    </div>
+                    <div class="history-date" style="margin-top:5px;">
+                        <img src="${GV.base_url}images/time-icon-orange.png" style="width:23px; margin-right:10px; "/>                               
+                        <div>10:30 - 12:30</div>
+                    </div>
+                    <div class="history-distance" style="margin-top:5px;">
+                        <img src="/images/location-icon-orange.png" style="width:20px; margin-right:12px;"/>
+                        <div style="padding-top:3px;">À 2.4 km</div>
+                    </div>
+                    <div class="history-complete-date gray">${moment(order.date).format('LL HH:mm')}</div>
+                </div>
+            </div>`;
+}
+
 
 
 $(document).on('click','.delete-order',async function(){
-    var order_id=$(this).closest('.history-element').data('id');
+    const order_id = $(this).closest('.product-element').data('id');
     await ajax2( GV.base_url+'ajax/delete_item', {table_name:'orders', id:order_id});
     init_page("history");
 });
 
-$(document).on('click','.change-order-status', function(){
-    var order_id=$(this).closest('.history-element').data('id');
-    var status=$(this).data('status');
-    change_order_status(order_id, status, $(this));
+$(document).on('click','.change-order-status', async function(){
+    const order_id = $(this).closest('.product-element').data('id');
+    const status = $(this).data('status');
+    try{
+        console.log({order_id, status});
+        await ajax2( GV.base_url+'ajax/change_order_status', {order_id, status});
+        init_page("history");
+    }catch(e){
+        console.log(e);
+        $(this).append('<div class="error">Une erreur s\'est produite</span>');
+    }
 });
-
-function change_order_status(order_id, status, $button){
-    ajax( GV.base_url+'ajax/change_order_status', {order_id:order_id, status:status }, function(data){
-       init_page("history");
-    }, function(err){
-     }, $button)
-}
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -651,166 +683,11 @@ $(document).on('click', '#user-disconnect', function(){
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-///////////////////       SPECIFIC product    //////////////////////////
+/////////////////////      PRODUCT PAGE     ///////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
 
-GV.functions.product = function(){
-    fade_panel($('#product-page'), true);
-    let product = GV.products[GV.selected_product_id];
-    let supplier = GV.suppliers[product.supplier_id];
-
-    display_wholeseller(product);
-    setTimeout(function(){
-        initialize_map($('#product-page-map'), supplier.lati, supplier.longi, 16, false);
-    },500);
-}
-
-
-
-$(document).on('click', '#main-page .product-element, #hot-products .product-element', function(){
-    GV.selected_product_id = $(this).data('id');
-    GV.functions.product();
-});
-
-
-function display_wholeseller(product){
-    let supplier = GV.suppliers[product.supplier_id];
-    let cart = GV.carts[1];
-    let points = supplier.ccontent?.points || 0;
-    const [CART_PRODUCTS, CART_PRICE] = cart_products(cart);
-    let html=`<div class="product-element" data-id="${product.id}">
-                <div class="panel-content" style="position:relative;">
-                    <div class="specific-product-top-actions  linear-top-black-background ">
-                        <img style="float:right; height:30px;" src="${GV.base_url}images/heart-icon-white.png"/>      
-                        <img class="close-panel" src="${GV.base_url}images/left-arrow-white.png"/>      
-                    </div>
-                    
-                    <div class="product-logo-container">
-                        <img class="product-logo centered-absolute-image" src="${GV.base_url}images/uploads/${supplier.content?.logo}"/>
-                    </div>
-                    <div class="product-image-container">
-                        <img class="product-image" src="${GV.base_url}images/uploads/${product.image}"/>                                    
-                        <div class="product-element-title-container  linear-black-background">
-                            <div class="product-element-title">${supplier.name}</div>
-                        </div>
-                    </div>
-                    <div class="product-element-text">
-                        <div class="product-price fright main-color" >
-                            <div style=" color:#ADADAD; text-decoration: line-through;">
-                                ${product.real_price} DA
-                            </div>  
-                            <strong >${product.price}</strong> DA
-                        </div>
-
-                        <div class="product-date padding5">
-                            <img src="${GV.base_url}images/time-icon.png" style="width:23px; margin-right:5px; "/>                                    
-                            <div>Aujourd'hui 10:30 - 12:30</div>
-                        </div>
-
-                        <div class="product-distance padding5">
-                            <img src="${GV.base_url}images/location-icon.png" style="width:20px; margin-right:7px;"/>
-                            <div style="padding-top:3px;">À 2.4 km</div>
-                        </div>
-
-                        <div id="progress-bar-container">
-                            <div class="progress-bar-title" >
-                                Vous avez ${get_user_points(supplier.id)} points sur ${points} <br> (Repas gratuit à ${points} points)
-                            </div>
-                        </div>
-                    </div>
-              
-                    <div id="product-information" >
-                        <div class="title carousel-title" style="padding:5px 0px; padding-bottom:20px; font-size:18px;">CONTENU DU PANIER</div>
-                        <div class="center" style="margin-top:20px;"> 
-                            <img src="${GV.base_url}images/uploads/${product.image}" style="width:100%; margin-bottom:20px;"/>
-                            ${product.description}
-                        </div>
-                    </div>
-                
-                    <div id="product-information" style="margin-bottom:200px;" >
-                        <div class="title carousel-title" style="padding:5px 0px; padding-bottom:20px; font-size:18px;"><span>ADRESSE DE L'ETABLISSEMENT</span></div>
-                        21 Lotissement des Lilas, Kouba, Alger    
-                        <div class="center" style="margin-top:20px;"> 
-                            <div id="product-page-map" style="display:inline-block;  width:90%; height:300px;"></div>
-                        </div>         
-                        <div class="center">
-                            <div class="btn" style="background:#3858ab; margin-top:20px;">PARTAGER VIA FACEBOOK</div>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-            <div class="panel-footer" style="display:grid; grid-template-columns:140px 1fr; align-items:center; ">
-                <div style="padding:0px 15px;">${number_picker_html('order-quantity',1, product.stock)}</div>
-                <div id="order-button" class="btn no-radius" style="width:90%;">RESERVER</div>                
-            </div>`;
-
-    let html2=`<div class="product-element" data-id="${product.id}">
-                <div class="panel-content" style="position:relative;">
-
-                    <div class="product-element-text">
-                        <div class="product-price fright main-color" >
-                            <div style=" color:#ADADAD; text-decoration: line-through;">
-                                ${CART_PRICE.real_price} DA
-                            </div>  
-                            <strong >${CART_PRICE.price}</strong> DA
-                        </div>
-
-                        <div class="product-date padding5">
-                            <img src="${GV.base_url}images/time-icon.png" style="width:23px; margin-right:5px; "/>                                    
-                            <div>Aujourd'hui 10:30 - 12:30</div>
-                        </div>
-
-                        <div class="product-distance padding5">
-                            <img src="${GV.base_url}images/location-icon.png" style="width:20px; margin-right:7px;"/>
-                            <div style="padding-top:3px;">À 2.4 km</div>
-                        </div>
-
-                    </div>
-                    <div id="product-information" >
-                        <div class="title carousel-title" style="padding:5px 0px; padding-bottom:20px; font-size:18px;">CONTENU DU PANIER</div>
-                        ${CART_PRODUCTS}
-                    </div>
-
-                    ${supplier_address_card()}
-                
-                </div>
-            </div>
-            <div class="panel-footer" style="margin: auto;">
-                <div id="order-button" class="btn no-radius" style="width:90%;">RESERVER CE PANIER</div>                
-            </div>`;
-
-        // $('#cart-page').html(html2);
-        $('#product-page').html(html);
-}
-
-function cart_products(cart){
-    let html = '', CART_PRICE = {price:0, real_price:0}
-    for (let p of JSON.parse(cart.products)){
-        let product = GV.products[p.id];
-        html += product_info_card(product);
-        CART_PRICE.price+=product.price
-        CART_PRICE.real_price+=product.real_price;
-    }
-    return [html, CART_PRICE];
-}
-
-function get_user_points(supplier_id){
-    if(!GV.user.id || !GV.user.points){return 0;}
-    var supplier_points=GV.user.points[supplier_id];
-    if(supplier_points == undefined){return 0;}
-    return supplier_points;
-}
-
-function product_info_card(product){
-    return `
-        <div class="center" style="margin-top:20px;"> 
-            <img src="${GV.base_url}images/uploads/${product.image}" style="width:100%; margin-bottom:20px; max-height:40vh; object-fit:cover;"/>
-            ${product.description}
-        </div>`
-}
 
 function supplier_address_card(){
     return `
@@ -831,47 +708,10 @@ $(document).on('click','#order-button', function(){
 });
 
 
-$(document).on('click','#login-button', function(){
-    if(!check_form($(this))){return;}
+$(document).on('click','#confirm-order-button', save_order);
 
-    user_login($('#login-email').val(), $('#login-password').val(), function(){
-        fade_panel($('#login-panel'), false);
-        if(GV.selected_product_id != undefined){
-            save_order($('#confirm-order-button'));
-            return;
-        }
-        init_page("main");
-    });
-});
-
-
-function user_login(email, password, callback){
-    ajax( GV.base_url+'ajax/login', { email:email, password:password }, function(data){
-        if(data['user']['id'] == undefined){
-            $('#login-error').html('Identifiants non valides');
-        }else{
-            $('#login-error').html('');
-            GV.user=data['user'];
-            
-            callback();  
-        }
-    }, function(err){
-        console.log(err);
-        $('#login-error').html('une erreur s\'est produite, veuillez réessayer');
-    })
-}
-
-$(document).on('click','#confirm-order-button', async function(){
-    if(!GV.user.id){
-        $('#login-panel .close-panel').css('display','inline-block');
-        fade_panel($('#login-panel'), true);
-        return;
-    }
-    await save_order($(this));
-});
-
-async function save_order($button){
-    let product = GV.products[GV.selected_product_id];
+async function save_order(){
+    let product = GV.indexed_products[GV.selected_product_id];
     if (product == undefined) return;
     let code='C'+generate_random_string('all',5);
     let quantity = get_number_picker_value('order-quantity') || 0;
@@ -890,7 +730,7 @@ async function save_order($button){
         fade_panel($('#order-success-panel'), true);
     } catch (e) {
         console.error(e);
-        $button.append('<div style="color:red">Une erreur s\'est produite</div>');
+        $("#confirm-order-button").append('<div style="color:red">Une erreur s\'est produite</div>');
     }
 }
 

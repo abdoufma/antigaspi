@@ -44,7 +44,6 @@ async function load_orders(){
     } catch (e) {
         console.error(e);
         $('.loading-container').append('<div style="color:red">Une erreur s\'est produite</div>');
-        setTimeout(function(){ load_orders()}, 2000);
     }
 }
 
@@ -174,18 +173,16 @@ GV.functions.carts = async function(){
 }
 
 
-$(document).on('click','#crm-carts-filter .tab-button', function(){
-    load_all().then(crm_display_carts);
-});
+$(document).on('click','#crm-carts-filter .tab-button', crm_display_carts);
 
 function crm_display_carts(){
     let html="";
     let filter=''+$('#crm-carts-filter .active-tab-button').data('value');
-    $.each(GV.orders, function(index, order){
+    const orders = Object.values(GV.orders).sort((a,b) => a.date < b.date ? 1 : -1);
+    $.each(orders, function(_, order){
         let user = GV.users[order.user_id];
         let product = GV.products[order.product_id];
         if (product == undefined) return;
-        // console.assert(product!=undefined)
         if(user == undefined){return true;}
         let {phone_number} = (user?.content);
         if(filter !== "" && order.status != filter){return true;}
@@ -196,9 +193,7 @@ function crm_display_carts(){
                 ><div class="product-element-right">
                     <div class="bold">${user.name}</div>
                     <div>${phone_number}</div>
-                    <div class="bold" style="margin-top:15px;">Panier Surprise</div>
-                    <div class="gray">${moment(order.date).fromNow()}</div>
-                    
+                    <div class="gray mt5">${moment(order.date).fromNow()}</div>
                     <div class="bold main-color" style="margin-top:15px;">${order.code}</div>
                     
                 </div>

@@ -6,6 +6,7 @@ const upload = require('./upload.js');
 const fetch = require('node-fetch');
 const moment = require('moment');
 const {BASE_URL, MAPS_API_KEY} = require('./config');
+const { readFileSync } = require('fs');
 
 router.get(`/all`,  async (req, res, next) => {
 	const {code, lang} = req.query;
@@ -57,9 +58,14 @@ router.get(`/test/:id`, async (req, res) => {
 
 router.get(`/maps`,  async (req, res, next) => {
 	const {lat, lng} = req.query;
-	const response = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=20&size=800x500&maptype=roadmap&key=${MAPS_API_KEY}&center=${lat},${lng}&markers=color%3Ared%7C${lat},${lng}`);
-    const buffer = await response.buffer();
-	res.contentType("image/png").send(buffer);
+	try {
+		const response = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=20&size=800x500&maptype=roadmap&key=${MAPS_API_KEY}&center=${lat},${lng}&markers=color%3Ared%7C${lat},${lng}`);
+	    const buffer = await response.buffer();
+		res.contentType("image/png").send(buffer);
+	} catch (err) {
+		const img = readFileSync("public/images/warning-icon-black.png")
+		res.contentType("image/png").send(img);
+	}
 });
 
 router.get(`/admin`,  async (req, res, next) => {
@@ -271,14 +277,13 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 			const lati = parseFloat(data.lati);
 			const longi = parseFloat(data.longi);
 			
-			const range = 0.05; // 0.1 =~ 9Km
+			const range = 0.1; // 0.1 =~ 9Km
 			for (const supplier of db_suppliers){
 				const content = JSON.parse(supplier.content);
 				let {lati:supplier_lat, longi:supplier_lng} = content || {};
-				if(!is_between(parseFloat(supplier_lat), lati-range, lati + range)) continue;
-				if(!is_between(parseFloat(supplier_lng), longi-range, longi + range)) continue;
-				console.log(supplier.name);
 				const distance = Math.sqrt(Math.pow((supplier_lat-lati),2) + Math.pow((supplier_lng-longi),2));
+				console.log(supplier.name , distance);
+				if(distance > range) continue;
 				suppliers[supplier.id] = {...supplier, distance};
 			};
 

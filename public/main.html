@@ -135,20 +135,28 @@
         </div>
         
         <div id="history-page" class="page">
-            <div class="history-category-container">
-                <div class="title" style="color:rgba(255, 123, 0, 1)" >COMMANDES EN COURS</div>
-                <div id="history-category0" class="history-category"></div>
-            </div
-
-            ><div class="history-category-container">
-                <div class="title">COMMANDES RÉCUPÉRÉES </br>(<span id="history-savings" style="font-weight:normal;"></span>)</div>
-                <div id="history-category1" class="history-category"></div>
-            </div
-
-            ><div class="history-category-container">
-                <div class="title">COMMANDES ANNULÉES</div>
-                <div id="history-category-1" class="history-category"></div>
+            <div class="top-header-title">
+                <div id="orders-filter" style="width:100%;">
+                    <div class="tab-button active-tab-button" data-value="0" style="padding:10px 0px;">EN COURS</div>
+                    <div class="tab-button"  data-value="1"  style="padding:10px 0px;">Historique</div>
+                </div>
             </div>
+
+            <div id="current-basket" class="active-tab-content tab-content mt100" data-tab="0" >
+                <div class="gray center">Votre panier est vide pour le moment.</div>
+            </div>
+
+            <div id="order-history" class="history-category tab-content mt100" data-tab="1">
+            </div>
+
+            <div id="confirm-qoffa-button" class="confirm-container">
+                <img src="images/cart2-green.svg" alt="" srcset="">
+            </div>
+
+        </div>
+
+
+            
         </div>
         
            
