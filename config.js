@@ -3,7 +3,7 @@ module.exports = {
     FCM_SERVER_KEY : "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTVkpajocntBhu-8JioVd0K-_UjcpoFct0EdHYstgNJlJYpxSnxJ5WG8JdrP5MSdcBMvwD0bSa1Zbe_9EtMqABP5S0bt94B7v7L",
     MAPS_API_KEY : 'AIzaSyA3kg7YWugGl1lTXmAmaBGPNhDW9pEh5bo',
     dbConfig: {
-        host:'antigaspi.dz',
+        host:'localhost',
         user:'devlog',
         password:'TestingThis43?#@', 
         database:'antigaspi'
