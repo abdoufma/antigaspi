@@ -191,7 +191,7 @@ function crm_display_carts(){
                     <img class="" src="${GV.base_url}images/uploads/${product.image || "product.png"}"/>
                 </div
                 ><div class="product-element-right">
-                    <div class="bold">${user.name}</div>
+                    <div class="bold">${user.name || "numéro de téléphone non spécifié"}</div>
                     <div>${phone_number}</div>
                     <div class="gray mt5">${moment(order.date).fromNow()}</div>
                     <div class="bold main-color" style="margin-top:15px;">${order.code}</div>
