@@ -5,7 +5,7 @@ GV.fcm_server_key = "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTVkpa
 GV.selected_big_category = undefined;
 GV.sort_dir = "desc";
 GV.sort_option = "date";
-GV.suppliers = {}; GV.products = []; GV.indexed_products = {}; GV.carts = {};
+GV.suppliers = {}; GV.products = []; GV.indexed_products = {}; GV.carts = {}; GV.orders = {};
 
 
 $(document).on('click','.header-button',function(){
@@ -135,13 +135,10 @@ async function load_products(){
     try{
         const {products, suppliers, carts} = await ajax2(GV.base_url+'ajax/load_products', { lati:GV.lati, longi:GV.longi});
         
-        // index_items(products, "products");
-        index(products);
+        // index(products);
         GV.products = products;
         GV.suppliers = suppliers;
         GV.carts = carts;
-        // index_items(suppliers, "suppliers");
-        // index_items(carts, "carts");
         console.log(suppliers);
         $('.loading-container').remove();
         console.log(products);
@@ -211,9 +208,7 @@ function get_product_big_categories(product){
 
 $(document).on('click','.product-card',async function () {
     GV.selected_product_id = $(this).data("id");
-    // console.log({selected_product_id:GV.selected_product_id});
-    // const product = GV.products[GV.selected_product_id];
-    const product = GV.indexed_products[GV.selected_product_id];
+    const product = GV.products[GV.selected_product_id];
     const supplier = GV.suppliers[product.supplier_id];
     fill_product_panel(product, supplier);
     let {lati, longi} = JSON.parse(supplier.content);
@@ -324,6 +319,12 @@ function index_items(data, type){
     });
 }
 
+function index_all(data){
+    $.each(data, function(table_name, table_data){
+        index_items(table_data, table_name);
+    })
+}
+
 const isJsonString = (v) => (typeof(v) === "string" && (v.startsWith("[") || v.startsWith("(")));
 
 //////////////////////////////////////////////////////////////////
@@ -402,7 +403,7 @@ function get_qoffa_items(items, surprise=false){
     console.log(items)
     let html = "";
     for (id of items){
-        const product = GV.indexed_products[id];
+        const product = GV.products[id];
         if(!product) continue;
         html += surprise ? 
             `<div class="qoffa-item suprise-qoffa-item swiper-slide flex col center">
@@ -470,8 +471,10 @@ $(document).on('click','#orders-filter .tab-button', function () {
 
 async function load_orders(){
     try {
-        let data = await ajax2( GV.base_url+'ajax/load_orders', { user_id:GV.user.id});
-        GV.orders = data['orders'];
+        const data = await ajax2( GV.base_url+'ajax/load_orders', { user_id:GV.user.id});
+        console.log(data);
+        index_all(data);
+        index(data.products)
         display_header_history_count();
         display_profile_stats();
         $('.loading-container').remove();
@@ -479,13 +482,13 @@ async function load_orders(){
     } catch (err) {
         console.log(err);
         $('.loading-container').append('<div style="color:red">Une erreur s\'est produite</div>');
-        setTimeout(function(){ load_orders()}, 2000);
+        // setTimeout(function(){ load_orders()}, 2000);
     }
 }
 
 function display_header_history_count(){
     if(GV.orders == undefined){$('#history-notification').text(0).fadeOut(); return; }
-    let count = GV.orders.findBy("status", 0).length;
+    let count = Object.values(GV.orders).findBy("status", 0).length;
     if(count == 0){
         $('#history-notification').text(0).fadeOut();
         return;
@@ -499,10 +502,11 @@ function display_history(){
     let savings = 0;
     let html = "", current_basket = "";
     $.each(GV.orders, function(_, order){
-        let product = GV.indexed_products[order.product_id];
+        let product = GV.products[order.product_id];
         if(product == undefined){return true;}
         let supplier = GV.suppliers[product.supplier_id];
         if(!supplier) return;
+        console.log(product.name);
         if(order.status == "1"){
             html = old_order_element(order, product, supplier) + html;
         }else{
@@ -522,21 +526,21 @@ function display_history(){
 
 function basket_element(order, product, supplier){
     const {address} = JSON.parse(supplier.content);
-    return `<div class="product-element" data-id="${order.id}">
-                <div class="product-element-left">
+    return `<div class="order-element" data-id="${order.id}">
+                <div class="order-element-left">
                     <img class="" src="${GV.base_url}images/uploads/${product.image || "product.png"}"/>
                 </div
-                ><div class="product-element-right">
+                ><div class="order-element-right flex col astart jcenter w100p h100p">
                     <div class="bold">${supplier.name}</div>
+                    <div>QTÉ: <span class="bold">x${order.quantity}</span></div>                   
+                    <div class="bold main-color mv5">${order.code}</div>                   
                     <div>${address || "Adresse non spécifiée"}</div>
-                    <div class="gray mt5">${moment(order.date).fromNow()}</div>
-                    <div class="bold main-color" style="margin-top:15px;">${order.code}</div>
-                    <div class="flex row gap10 mt15 center" >
-                        <div class="delete-order btn red-background" style="padding:10px">Annuler</div>
-                        <div class="change-order-status btn" data-status="1" style="padding:10px;">RÉCUPÉRÉ</div>
+                    <div class="gray">${moment(order.date).fromNow()}</div>
                     </div>
-                    
-                </div>
+                    <div class="col-span2 w100p p5 flex row gap10 mt15 center" >
+                        <div class="delete-order btn red-background w100p" style="padding:10px">Annuler</div>
+                        <div class="change-order-status btn w100p" data-status="1" style="padding:10px;">RÉCUPÉRÉ</div>
+                    </div>
             </div>`;
 }
 
@@ -552,7 +556,7 @@ function old_order_element(order, product, supplier){
                     </div>
                     <div class="bold" style="text-transform:capitalize;">${product.name} (x${order.quantity})</div>
                     <div class="history-element-title bold" style="color:black;">${supplier.name}</div>
-                    <div class="history-element-code">CODE <strong>AGX257</strong></div>
+                    <div class="history-element-code">CODE <strong>${order.code}</strong></div>
                     <div class="history-price main-color" >
                         <span style="margin-right:15px; "><strong >${calculate_price(product, order.quantity)}</strong> DA</span>
                         <span style=" color:#ADADAD; text-decoration: line-through; ">${calculate_real_price(product, order.quantity)} DA</span>
@@ -579,7 +583,7 @@ $(document).on('click','.delete-order',async function(){
 });
 
 $(document).on('click','.change-order-status', async function(){
-    const order_id = $(this).closest('.product-element').data('id');
+    const order_id = $(this).closest('.order-element').data('id');
     const status = $(this).data('status');
     try{
         console.log({order_id, status});
@@ -589,6 +593,7 @@ $(document).on('click','.change-order-status', async function(){
         console.log(e);
         $(this).append('<div class="error">Une erreur s\'est produite</span>');
     }
+    fade_panel($('#order-confirm-panel'), true);
 });
 
 
@@ -704,14 +709,14 @@ function supplier_address_card(){
 }
 
 $(document).on('click','#order-button', function(){
-    fade_panel($('#order-confirm-panel'), true);
+    // fade_panel($('#order-confirm-panel'), true);
 });
 
 
-$(document).on('click','#confirm-order-button', save_order);
+$(document).on('click','#order-button', save_order);
 
 async function save_order(){
-    let product = GV.indexed_products[GV.selected_product_id];
+    let product = GV.products[GV.selected_product_id];
     if (product == undefined) return;
     let code='C'+generate_random_string('all',5);
     let quantity = get_number_picker_value('order-quantity') || 0;
@@ -730,7 +735,7 @@ async function save_order(){
         fade_panel($('#order-success-panel'), true);
     } catch (e) {
         console.error(e);
-        $("#confirm-order-button").append('<div style="color:red">Une erreur s\'est produite</div>');
+        $(this).append('<div style="color:red">Une erreur s\'est produite</div>');
     }
 }
 

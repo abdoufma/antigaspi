@@ -9,4 +9,4 @@ config.js
 .vscode
 config.js
 package.json
-config.js
+./config.js

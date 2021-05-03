@@ -478,6 +478,7 @@ input, textarea, select{padding:15px 10px; width:100%; background:#f0f0f0;  }
 ////////////////////////////////////////////////////////////
 */
 
+#history-page {padding-bottom: 10vh;}
 #history-page .title{padding:20px; border-bottom:1px solid #DADADA; font-size:17px;}
 #orders-filter{padding: 0;}
 #orders-filter .tab-button{padding: 0;}
@@ -512,7 +513,7 @@ input, textarea, select{padding:15px 10px; width:100%; background:#f0f0f0;  }
     /* width: 100%; */
     text-align: center;
     padding: 15px;
-    background-color: white;
+    background-color: var(--antigaspiGreen);
     border-radius: 50%;
     box-shadow: 0px 2px 6px #808080;
 }
@@ -644,11 +645,28 @@ input, textarea, select{padding:15px 10px; width:100%; background:#f0f0f0;  }
 #crm-profile-form input{padding:12px; width:90%; background:#f0f0f0;  margin-top:5px; margin-bottom:15px;}
 
 .product-element{display:grid; grid-template-columns: 1fr 2fr;  place-items: center;  width:95%; box-shadow:2px 2px 8px RGBA(0,0,0,0.1); background-color:#fff; margin:0 auto; margin-top:20px; border-radius:5px}
-.product-element-left{  }
 .product-element-left img{height:200px; max-width: 160px; object-fit: cover;}
 .product-element-right{padding:20px 10px; }
 
+.order-element{display:grid; grid-template-columns: 1fr 2fr;  place-items: center start;  width:95%; box-shadow:2px 2px 8px RGBA(0,0,0,0.1); background-color:#fff; margin:0 auto; margin-top:20px; border-radius:5px}
+.order-element-left img{height:180px; width: 160px; object-fit: cover;}
+.order-element-right{padding: 10px; padding-left:20px;}
 
+.rating {
+	unicode-bidi: bidi-override;
+	direction: rtl;
+	font-size: 2.2rem;
+  }
+  .rating > span {
+	display: inline-block;
+	position: relative;
+	width: 1.1em;
+  }
+  .rating > span:hover:before,
+  .rating > span:hover ~ span:before {
+	 content: "\2605";
+	 position: absolute;
+  }
 
 .basket-element{display:grid; grid-template-columns: 1fr 2fr;  place-items: center; position: relative; width:95%; box-shadow:2px 2px 8px RGBA(0,0,0,0.1); background-color:#fff; margin:0 auto; margin-top:20px; border-radius:5px}
 .basket-element-left{display:grid; place-items: center; height: 100%; width:100%;}

@@ -137,7 +137,7 @@
         <div id="history-page" class="page">
             <div class="top-header-title">
                 <div id="orders-filter" style="width:100%;">
-                    <div class="tab-button active-tab-button" data-value="0" style="padding:10px 0px;">EN COURS</div>
+                    <div class="tab-button active-tab-button" data-value="0" style="padding:10px 0px;">Mon panier</div>
                     <div class="tab-button"  data-value="1"  style="padding:10px 0px;">Historique</div>
                 </div>
             </div>
@@ -150,7 +150,7 @@
             </div>
 
             <div id="confirm-qoffa-button" class="confirm-container">
-                <img src="images/cart2-green.svg" alt="" srcset="">
+                <img src="images/cart2.svg" alt="" srcset="">
             </div>
 
         </div>
@@ -232,21 +232,26 @@
     <div id="order-confirm-panel" class="panel">
         <div class="panel-header" style="box-shadow:none; border-bottom:1px solid #E8E8E8;">
             <div class="close-panel" style="float:left; padding:0px 20px;"><img src="./images/left-arrow-black.png" style="height:25px; margin-top:10px;"/></div>
-            <div>Confirmer la commande</div>
+            <div>Coammande Récupérée</div>
         </div>
 
         <div style="margin:30px 0px 10px 0px;  text-align:center;">
             <img src="./images/surprise-bag-icon.png" style="width:50%;"/>
         </div>
         <div class="title" style="text-align:center; padding:20px 0px;">
-            Confirmation
+            Merci d'avoir utilié Antigagspi! 
         </div>
         <div style="padding:0px 20px;">
-            Voulez-vous confirmer votre commande pour la récupérer directement auprès du commerce ? <br><br>
-
+            <br/>
+            Ce produit vous a-t-il plu? <br>Merci de laisser vos retours:
         </div>
+
+        <div class="rating">
+            <span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>
+        </div>
+
         <div class="center mauto w80p" style="margin-top:15px;">
-            <div id="confirm-order-button" class="btn">CONFIRMER</div>                
+            <div id="confirm-order-button" class="btn close-panel">Noter ce produit</div>                
         </div>
     </div>
 
@@ -261,11 +266,12 @@
         </div>
 
         <div class="center">
-            <div id="go-to-history" class="btn mauto close-all-panels" style="width:85%;">SUIVRE MA COMMANDE</div>                
+            <div id="coninue-shopping" class="btn close-all-panels mb10" style="width:85%;">Continuer mes courses</div>                
+            <div id="go-to-history" class="btn mauto close-all-panels" style="width:85%;">Voir mon panier</div>                
         </div>
 
         
-        <p class="mb15 mt200">Lien utils:</p>
+        <p class="mb15 mt200">Actions utils:</p>
 
         <div class="mb10 supplier-actions flex col ap10">
             <div class="supplier-action call-supplier primary-b" data-phone_number="">

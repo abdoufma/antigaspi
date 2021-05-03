@@ -336,11 +336,16 @@ td{padding:15px 20px;}
 .m10{margin:10px;}
 .m15{margin:15px;}
 .m20{margin:15px;}
+.m25{margin:25px;}
+.m30{margin:30px;}
+.m40{margin:40px;}
+.m50{margin:50px;}
 
 .mt5{margin-top:5px;}
 .mt10{margin-top:10px;}
 .mt15{margin-top:15px;}
 .mt20{margin-top:20px;}
+.mt25{margin-top:25px;}
 .mt30{margin-top:30px;}
 .mt40{margin-top:40px;}
 .mt50{margin-top:50px;}
@@ -351,7 +356,28 @@ td{padding:15px 20px;}
 .mb5{margin-bottom:5px;}
 .mb10{margin-bottom:10px;}
 .mb15{margin-bottom:15px;}
-.mb20{margin-bottom:15px;}
+.mb20{margin-bottom:20px;}
+.mb25{margin-bottom:25px;}
+.mb30{margin-bottom:30px;}
+.mb40{margin-bottom:40px;}
+.mb50{margin-bottom:50px;}
+.mb80{margin-bottom:80px;}
+.mb100{margin-bottom:100px;}
+
+.mv5{margin: 5px 0;}
+.mv10{margin: 10px 0;}
+.mv15{margin: 15px 0;}
+.mv20{margin: 20px 0;}
+.mv25{margin: 25px 0;}
+.mv30{margin: 30px 0;}
+.mv40{margin: 40px 0;}
+.mv50{margin: 50px 0;}
+.mv80{margin: 80px 0;}
+.mv100{margin: 100px 0;}
+
+
+
+
 
 /** width **/
 
@@ -641,6 +667,14 @@ select.pop-input{width:79%; color:#686868; }
 .flex.space-evenly{justify-content: space-evenly}
 .flex.space-between{justify-content: space-between}
 .flex.space-around{justify-content: space-around}
+
+.flex.astart{align-items: start;}
+.flex.aend{align-items: end;}
+.flex.acenter{align-items: center;}
+
+.flex.jstart{justify-content: start;}
+.flex.jend{justify-content: end;}
+.flex.jcenter{justify-content: center;}
 
 .flex.wrap{flex-wrap: wrap;}
 .flex.nowrap{flex-wrap: nowrap;}

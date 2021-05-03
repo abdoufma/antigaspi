@@ -238,9 +238,19 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 		if(func_name == 'load_orders'){
             const {user_id, supplier_id} = data;
 
-		    result['orders'] = (user_id) ?
+		    const orders = (user_id) ?
             await db.select('*', 'orders', {user_id, deleted:0}) :
             await db.select('*', 'orders', {supplier_id, deleted: 0});
+
+			const products = [], suppliers = [];
+			for (let order of orders){
+				const product = await db.select('*', 'products', {id:order.product_id}, "row");
+				if(product) products.push(product);
+				const supplier = await db.select('*', 'users', {id:order.supplier_id}, "row")
+				if(supplier) suppliers.push(supplier);
+			}
+
+			result = {orders, products, suppliers};
 		}
 
 		if(func_name == 'load_baskets'){
@@ -273,7 +283,7 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 		if(func_name == 'load_products'){
 			const db_suppliers = await db.select('*','users', {type:"supplier", deleted : 0, active: 1});
 			const db_products = await db.exec_query("SELECT * FROM products WHERE deleted = 0 AND published = 1 AND stock > 0  ORDER BY date DESC"); 
-			const products = [], suppliers = {};
+			const products = {}, suppliers = {};
 			const lati = parseFloat(data.lati);
 			const longi = parseFloat(data.longi);
 			
@@ -289,8 +299,8 @@ router.post(`/ajax/:id`, async (req, res, next) => {
 
 			for (const product of db_products){
 				if(suppliers[product.supplier_id] == undefined ) continue;
-				products.distance = suppliers[product.supplier_id].distance;
-				products.push(product);
+				product.distance = suppliers[product.supplier_id].distance;
+				products[product.id] = product;
 			};
 
 			result = {suppliers, products};
