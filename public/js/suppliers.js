@@ -192,7 +192,7 @@ function crm_display_carts(){
                 </div
                 ><div class="product-element-right">
                     <div class="bold">${user.name || "numéro de téléphone non spécifié"}</div>
-                    <div>${phone_number}</div>
+                    <div>${phone_number || "numéro de téléphone non spécifié"}</div>
                     <div class="gray mt5">${moment(order.date).fromNow()}</div>
                     <div class="bold main-color" style="margin-top:15px;">${order.code}</div>
                     
