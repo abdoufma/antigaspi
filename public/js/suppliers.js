@@ -3,7 +3,7 @@ GV.product_types={"0":"Pannier surprise", "1":"Produit unique"};
 
 
 load_all().then(() => {					
-    GV.supplier.content = typeof(GV.supplier.content) == "string" ? JSON.parse(GV.supplier.content) : GV.supplier.content;
+    // GV.supplier.content = typeof(GV.supplier.content) == "string" ? JSON.parse(GV.supplier.content) : GV.supplier.content;
     navigate_to("carts");
 });
 
@@ -25,14 +25,11 @@ function navigate_to(page_name){
 
 async function load_all(){
     try {
-        let data = await ajax2( GV.base_url+'ajax/load_all', { supplier_id:GV.supplier.id});
+        let data = await ajax2( GV.base_url+'ajax/load_all', { supplier_id: GV.supplier.id});
         index_all(data);
     } catch (err) {
         $('.loading-container').append("<div style='color:red'>Une erreur s'est produite</div>");
-        setTimeout(() => load_all(), 2000);
-    }
-
-       
+    }       
 }
 
 async function load_orders(){
@@ -65,111 +62,32 @@ function index_all(data){
 }
 
 
-GV.functions.explore = async function(){
-    await load_all();
-    const all_suppliers = Object.values(GV.suppliers);
-    const wholesellers = all_suppliers?.findBy('supplier_type','retailer', 'content');
-    let html = '';
-    for (seller of wholesellers){
-        console.log(seller);
-        html += `
-        <div class="supplier-element" data-id="${seller.id}" >
-            <div class="supplier-logo"><img src="./images/uploads/${seller.content?.logo}" alt="${seller.name}"></div>
-            <div class="supplier-info">
-                <div class="supplier-name">${seller.name}</div>
-                
-                <div class="gray">Boulanger</div>
-                <div class="">21, Rue des frères Achour, Cheraga.</div>
-            </div>
-        </div>`;
-    }
-    $("#suppliers-container").html(html);
-}
 
-
-$(document).on('click','#explore-page .supplier-element', function() {
-    GV.selected_seller = $(this).data("id");
-    GV.functions.wholesellers();
-});
-
-
-GV.functions.wholesellers = function(){
-    fade_panel($('#wholesellers-page'), true);
-    const seller = GV.suppliers[GV.selected_seller];
-    display_wholeseller(seller);
-}
-
-
-function display_wholeseller(seller){
-    const products = Object.values(GV.products).findBy("supplier_id", seller.id);
-    const product = products[0];
-    let html=`<div class="product-element" data-id="${seller.id}">
-                <div class="panel-content" style="position:relative;">
-                    <div class="specific-product-top-actions  linear-top-black-background ">
-                        <img style="float:right; height:30px;" src="${GV.base_url}images/heart-icon-white.png"/>      
-                        <img class="close-panel" src="${GV.base_url}images/left-arrow-white.png"/>      
-                    </div>
-                    
-                    <div class="product-image-container">
-                        <img class="product-image" src="${GV.base_url}images/uploads/${seller.content?.logo}"/>                                    
-                        <div class="product-element-title-container linear-black-background">
-                            <div class="product-element-title">${seller.name}</div>
-                        </div>
-                    </div>
-                    <div class="product-element-text">
-
-                        <div class="product-distance padding5">
-                            <img src="${GV.base_url}images/location-icon.png" style="width:20px; margin-right:7px;"/>
-                            <div style="padding-top:3px;">123, Rue El Qods, Chéraga, Alger</div>
-                        </div>
-
-                    </div>`;
-              
-   
-                    let temp = "";
-                    for (let product of products){
-                        temp += `
-                            <div class="product-element center" style="margin-top:20px;"> 
-                                <img src="${GV.base_url}images/uploads/${product.image}" style="width:100%; margin-bottom:20px;"/>
-                                <div>${product.name}</div>
-                            </div>`
-                    }
-                    const no_element = `<div class="center gray" style="margin-top:20px;">Aucun Elelment à afficher.</div>`;
-                    html += `
-                        <div class="title carousel-title" style="padding:5px 0px; padding-bottom:20px; font-size:18px;">LISTE DES PRODUITS</div>
-                        <div id="products-list" >
-                            ${temp == "" ? no_element : temp}
-                        </div>`;
-
-                    html += `<div id="supplier-information" style="margin:50px; 10px" >
-                        <div class="title carousel-title" style="padding:5px 0px; padding-bottom:20px; font-size:18px;"><span>ADRESSE DE L'ETABLISSEMENT</span></div>
-                        123, Rue El Qods, Chéraga, Alger         
-                        <div class="center">
-                            <div class="btn" style="background:#3858ab; margin-top:20px;">PARTAGER VIA FACEBOOK</div>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>`;
-        $('#wholesellers-page').html(html);
-}
-
+////////////////////////////////////////////////////
+////////////////////  ORDERS  //////////////////////
+////////////////////////////////////////////////////
 
 
 GV.functions.carts = async function(){
-    await load_all();
-    crm_display_carts();
-    if ("android" in window){
-        GV.token = window.android.getToken();
-        console.log("got em", GV.token);
-        ajax2(GV.base_url+'ajax/save_token', {id:GV.supplier.id, token:GV.token});
-    } else console.log('fuck off, filthy desktop user!');
-
-    requestLocationPermission();
-    let {lat, lng} = await getLocation();
-    console.log(`(${lat},${lng})`);
-    GV.lati = lat;
-    GV.longi = lng;
+    GV.supplier.content = typeof(GV.supplier.content) == "string" ? JSON.parse(GV.supplier.content) : GV.supplier.content;
+    try {
+        await load_all();
+        crm_display_carts();
+        if ("android" in window){
+            GV.token = window.android.getToken();
+            console.log("got em", GV.token);
+            ajax2(GV.base_url+'ajax/save_token', {id:GV.supplier.id, token:GV.token});
+        } else console.log('fuck off, filthy desktop user!');
+    
+        requestLocationPermission();
+        let {lat, lng} = await getLocation();
+        console.log(`(${lat},${lng})`);
+        GV.lati = lat;
+        GV.longi = lng;
+    } catch (err) {
+        console.log(err);
+        $('.loading-container').append('<div style="color:red">Une erreur s\'est produite</div>');
+    }
 }
 
 
@@ -484,7 +402,7 @@ $(document).on('click','#delete-basket', function(){
         if($('#basket-id').val() ==""){return; }
         let id = $('#basket-id').val();
         try {
-            let {error} = await ajax2('/ajax/delete_item', { id, table_name:"baskets"}); 
+            let {error} = await ajax2('/api/delete_item', { id, table_name:"baskets"}); 
             delete GV.baskets[id];
             fade_panel($('#new-basket-panel'),false);
             $('.header-button[data-name="products"]').click();   
@@ -627,13 +545,13 @@ $(document).on('click','#delete-product', function(){
         if($('#product-id').val() ==""){return; }
         let id = parseInt($('#product-id').val());
         try {
-            let {error} = await ajax2('/ajax/delete_item', { id, table_name:"products"}); 
+            const {error} = await ajax2('/api/delete_item', { id, table_name:"products"}); 
             delete GV.products[id];
             const baskets = [];
             // Optimize this
             for (let b of Object.values(GV.baskets)){
                 if(b.products.includes(id)){
-                    await ajax2('/ajax/delete_item', { id:b.id, table_name:"baskets"}); 
+                    await ajax2('/api/delete_item', { id:b.id, table_name:"baskets"}); 
                 }
             }
             console.log(baskets);

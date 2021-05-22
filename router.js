@@ -3,10 +3,18 @@ const router = require('express').Router();
 const db = require('./db.js');
 const fn = require('./functions.js');
 const upload = require('./upload.js');
+const apiHandler = require('./api_handler');
 const fetch = require('node-fetch');
-const moment = require('moment');
 const {BASE_URL, MAPS_API_KEY} = require('./config');
 const { readFileSync } = require('fs');
+
+
+router.post(`/uploads`, upload.single('file'), (req, res, next) => {
+	const file_name = basename(req.file.path);
+	console.log(req.file);
+	res.json({file_name});
+});
+
 
 router.get(`/all`,  async (req, res, next) => {
 	const {code, lang} = req.query;
@@ -21,6 +29,9 @@ router.get(`/all`,  async (req, res, next) => {
 			if(db_user){
 				req.session.user_id = db_user.id;
 				fn.render(req, res, "main", {user:db_user, categories}, lang);
+				// res.render("main", {db_user: JSON.stringify(db_user), categories, message: "hello"}, (err) => {
+				// 	console.log(err);
+				// });
 			}else{
 				let {insertId} = await db.insert("users", {...fb_user, type:"user"});
 				req.session.user_id = insertId;
@@ -33,55 +44,34 @@ router.get(`/all`,  async (req, res, next) => {
 			let user = await db.select('*', "users", {id:user_id}, "row");
 			if(user == undefined){return res.send("<h2>User not found<h2>")}
 			switch (user.type) {
-				case "user": fn.render(req, res, "main", {user, categories: await db.select('*','categories', {}, 'indexed')}, lang);  break;
+				// case "user": fn.render(req, res, "main", {user, categories: await db.select('*','categories', {}, 'indexed')}, lang);  break;
+				case "user": 
+					const categories = await db.select('*','categories', {}, 'indexed');
+					res.render("main", {user: JSON.stringify(user), categories: JSON.stringify(categories)});  
+				break;
 				case "admin": fn.render(req, res, "admin", {user}, lang); break;
 				case "supplier": fn.render(req, res, "supplier", {supplier:user}, lang); break;
 				default: res.redirect("/disconnect"); break;
 			}
 		}else{
-			fn.render(req, res, "login", {}, lang);
+			const tl = require("./translations.json");
+			// fn.render(req, res, "login", {}, lang);
+			res.render("login", tl["fr"]);
 		}
 	} catch (err) {
 		res.status(500).json({fb_user, error:err.message, stack:err.stack});
 	}
 });
 
-router.get(`/test/:id`, async (req, res) => {
-	try {
-		const {id} = req.params
-		res.send(await db.select('*', "users", {id}));
-	} catch (err) {
-		res.status(500).send({error:err.message});
-	}
-})
-
-
-router.get(`/maps`,  async (req, res, next) => {
-	const {lat, lng} = req.query;
-	try {
-		const response = await fetch(`https://maps.googleapis.com/maps/api/staticmap?zoom=20&size=800x500&maptype=roadmap&key=${MAPS_API_KEY}&center=${lat},${lng}&markers=color%3Ared%7C${lat},${lng}`);
-	    const buffer = await response.buffer();
-		res.contentType("image/png").send(buffer);
-	} catch (err) {
-		const img = readFileSync("public/images/warning-icon-black.png")
-		res.contentType("image/png").send(img);
-	}
-});
 
 router.get(`/admin`,  async (req, res, next) => {
 	if(!await fn.authenticate(req, res, "admin")){ return; }
 	fn.render(req, res, "admin",{admin:req.user});
 });
 
+
 router.get(`/tos`, async (req, res) => {
-	fn.render(req, res, "tos");
-});
-
-
-router.post(`/uploads`, upload.single('file'), (req, res, next) => {
-	const file_name = basename(req.file.path);
-	console.log(req.file);
-	res.json({file_name});
+	res.render("tos", {message: "done!"});
 });
 
 
@@ -90,6 +80,7 @@ router.post(`/signup`, async (req, res, next) => {
 });
 
 router.post(`/login`, async (req,res) => {
+	console.log("loggin in...")
 	await fn.login(req,res);
 });
 
@@ -108,261 +99,10 @@ router.get(`/reset_password`, async (req, res, next) => {
 	fn.render(req, res, "reset", {email, invalid: true});
 });
 
-
-router.get(`/push`, async (req,res) => {
-	fn.render(req, res, "notifications");
-});
-
 router.get(`/firebase-messaging-sw.js`, (_,res) => res.sendFile(resolve(__dirname, "public/js", "firebase-messaging-sw.js")));
 
 
-router.post(`/ajax/:id`, async (req, res, next) => {
-	let result = {};
-	let func_name = req.params.id;
-	let data = req.body;	
-	
-	try{
-		console.log(`----${func_name}----`);
-		if(func_name == 'load_all'){
-			let {supplier_id} = data;
-			if(supplier_id != "0"){
-				result['categories'] = await db.select('*', 'categories');
-				result['products'] = await db.select('*', 'products',{supplier_id, deleted:0});
-				result['baskets'] = await db.select('*', 'baskets', {supplier_id, deleted:0});
-				result['suppliers'] = await db.select('*', 'users',{type: "supplier" ,deleted:0});
-				result['orders'] = await db.select('*', 'orders', {supplier_id, deleted:0});
-				let users_ids = {};
-				db.foreach(result['orders'], function(i,v){
-					users_ids[v.user_id] = true;
-				})
-		
-				let users = await db.select('*', 'users', {type:"user"});
-				result['users'] = [];
-
-				users.forEach((u) => {
-					if(users_ids[u.id] == undefined){return;}
-					result['users'].push(u);
-				});
-
-			}else{
-				result['categories'] = await db.select('*', 'categories',{type:'!-1', deleted:0});
-				result['products'] = await db.select('*', 'products',{deleted:0});
-				result['orders'] = await db.select('*', 'orders',{deleted:0});
-				result['baskets'] = await db.select('*', 'baskets', {supplier_id, deleted:0});
-				result['users'] = await db.select('*', 'users',{type: "user" , deleted:0}, null, 100);
-				result['suppliers'] = await db.select('*', 'users',{type: "supplier" ,deleted:0});
-			}
-		}
-
-
-		if(func_name == 'save_item'){
-			let {item, table} = data;
-			if(!item.id){
-				let {insertId} = await db.insert(table, item);
-				item.id = insertId;
-			}else{
-				await db.update(table, item, {id:item.id});
-			}
-			result[table]=await db.select('*',table, {id :item.id});
-		}
-
-		if(func_name == 'save_user'){
-			let {item } = data;
-			if(!item.id){
-				let {insertId} = await db.insert("users", item);
-				item.id = insertId;
-			}else{
-				await db.update("users", item, {id:item.id});
-			}
-			result["user"] = await db.select('*', "users", {id :item.id});
-		}
-
-
-		if(func_name == 'delete_item'){
-			await db.update(data.table_name, {deleted:1}, {id:data.id});
-			result["deleted"]=data.id;
-		}
-
-		if(func_name == 'delete_user'){
-			let {id} = data
-			result["deleted"] = await db.update("users", {deleted:1, active: -1}, {id});
-		}
-
-		
-		if(func_name == 'update_user'){
-			let user = JSON.parse(data.user);
-			let res = await db.update('users', user, {id:user.id});
-			console.log({res});
-		}
-
-		if(func_name == 'save_token'){
-			let {id, token} = data
-			let user = await db.select('*', 'users', {id}, "row");
-			let content = JSON.parse(user.content) || {};
-			content.token = token;
-			result = await db.update('users', {content}, {id});
-		}
-
-		
-		if(func_name == 'save_profile'){
-			let {supplier} = data;
-			let {id, content} = supplier;
-			let {content: db_content} = await db.select('content', "users", {id},"row");
-			supplier.content = {...JSON.parse(db_content), ...JSON.parse(content)};
-			await db.update('users', supplier, {id});
-		}
-
-
-		if(func_name == 'save_product'){
-			let {product} = data;
-			if(!product.id){
-				let {insertId} = await db.insert("products", product);
-				product.id = insertId;
-			}else{
-				await db.update("products", product, {id:product.id});
-			}
-			result = await db.select('*', "products", {id :product.id}, "row");
-		}
-		
-		if(func_name == 'save_basket'){
-			let {basket} = data;
-			if(!basket.id){
-				let {insertId} = await db.insert("baskets", basket);
-				basket.id = insertId;
-			}else{
-				await db.update("baskets", basket, {id:basket.id});
-			}
-			result = await db.select('*', "baskets", {id :basket.id});
-		}
-
-		if(func_name == 'load_orders'){
-            const {user_id, supplier_id} = data;
-
-		    const orders = (user_id) ?
-            await db.select('*', 'orders', {user_id, deleted:0}) :
-            await db.select('*', 'orders', {supplier_id, deleted: 0});
-
-			const products = [], suppliers = [];
-			for (let order of orders){
-				const product = await db.select('*', 'products', {id:order.product_id}, "row");
-				if(product) products.push(product);
-				const supplier = await db.select('*', 'users', {id:order.supplier_id}, "row")
-				if(supplier) suppliers.push(supplier);
-			}
-
-			result = {orders, products, suppliers};
-		}
-
-		if(func_name == 'load_baskets'){
-			const today = moment().format("YYYY-MM-DD");
-			const db_baskets = await db.exec_query(`SELECT * FROM baskets WHERE deleted = 0 AND stock > 0  AND expiry > "${today}" ORDER BY date DESC`);
-			const baskets = {};
-			for (let basket of db_baskets) baskets[basket.id] = basket;
-			result['baskets'] = baskets;
-		}
-
-
-
-		if(func_name == 'save_order'){
-			let {order} = data;
-			order.status = order.status || 0;
-			await db.insert('orders', order);
-			let product = await db.select('*','products',{id:order.product_id}, 'row');
-			let stock = parseInt(product.stock) - order.quantity;
-			await db.update('products', {stock}, {id:order.product_id});
-			let supplier = await db.select('*','users',{id:order.supplier_id}, 'row');
-			result = await notifySupplier(order, product, supplier)
-		}
-
-
-		if(func_name == 'change_order_status'){
-			await db.update('orders', {status:data.status}, {id:data.order_id});
-		}
-
-
-		if(func_name == 'load_products'){
-			const db_suppliers = await db.select('*','users', {type:"supplier", deleted : 0, active: 1});
-			const db_products = await db.exec_query("SELECT * FROM products WHERE deleted = 0 AND published = 1 AND stock > 0  ORDER BY date DESC"); 
-			const products = {}, suppliers = {};
-			const lati = parseFloat(data.lati);
-			const longi = parseFloat(data.longi);
-			
-			const range = 0.1; // 0.1 =~ 9Km
-			for (const supplier of db_suppliers){
-				const content = JSON.parse(supplier.content);
-				let {lati:supplier_lat, longi:supplier_lng} = content || {};
-				const distance = Math.sqrt(Math.pow((supplier_lat-lati),2) + Math.pow((supplier_lng-longi),2));
-				console.log(supplier.name , distance);
-				if(distance > range) continue;
-				suppliers[supplier.id] = {...supplier, distance};
-			};
-
-			for (const product of db_products){
-				if(suppliers[product.supplier_id] == undefined ) continue;
-				product.distance = suppliers[product.supplier_id].distance;
-				products[product.id] = product;
-			};
-
-			result = {suppliers, products};
-
-		}
-
-
-		if(func_name == 'search_products'){
-			let {key} = data;
-			result = await db.exec_query(`SELECT * FROM products WHERE name LIKE "%${key}%" AND deleted = 0`, "indexed");
-		}
-
-
-
-		if(func_name == 'forgotten_password'){
-			let {email} = data;
-			try {
-				const {sendEmail} = require('./mailer');
-				console.log("sending");
-				const link = encodeURI(`${BASE_URL}reset_password?email="${email}"&token=123456789`);
-				const html = `<h3>Cliquez sur le lien suivant pour réinitialiser votre mot de passe:<h3>
-								<b><a href="${link}">Réinitialiser</a></b>`;
-				result = await sendEmail({to:email, subject:"Password Reset", html });
-			} catch (error) {
-				console.error("Oh shi-");
-				result = {error};
-			}
-		}
-
-		if(func_name == 'reset_password'){
-			const {email, password} = data;
-			try {
-				await db.update("users",{password},{email});
-				result["success"] = true;
-			} catch (error) {
-				console.error("Oh shi-");
-				result = {error};
-			}
-		}
-
-		res.send(result);
-
-	}
-	catch(error){
-		console.error(error);
-		res.status(500).json({error:error.message, stack:error.stack});
-	}
-});
-
-
-
-function notifySupplier(order, product, {content}) {             
-	let {token} = JSON.parse(content);
-	if(token==undefined) return ; //throw new Error("Invalid token");
-	let title = "Nouvelle commande";
-	let body = `Vous avez une commande pour ${order.quantity} ${product.name}`;
-	return fn.send_notification(title, body, token);
-}
-
-
-
-const is_between = (num, min, max) => num > min && num < max;
+router.use("/api", apiHandler);
 
 
 module.exports = router;

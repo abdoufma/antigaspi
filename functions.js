@@ -185,6 +185,7 @@ fn.login = async function(req, res){
 	let {email, password} = req.body;		
 	try {
 		let user = await db.select('*', "users", {email, password}, 'row');	
+		console.log(user);
 		if(user){
 			if(user.active === -1){
 				res.status(403).send({error:"Ce Compte à été banni par l'administateur du site."});

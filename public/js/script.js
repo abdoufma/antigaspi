@@ -1,13 +1,3 @@
-GV.longi = 3.0100658000000067;
-GV.lati = 36.7574811;
-GV.place_name = "Adresse non spécifiée";
-GV.fcm_server_key = "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTVkpajocntBhu-8JioVd0K-_UjcpoFct0EdHYstgNJlJYpxSnxJ5WG8JdrP5MSdcBMvwD0bSa1Zbe_9EtMqABP5S0bt94B7v7L"
-GV.selected_big_category = undefined;
-GV.sort_dir = "desc";
-GV.sort_option = "date";
-GV.suppliers = {}; GV.products = []; GV.indexed_products = {}; GV.carts = {}; GV.orders = {};
-
-
 $(document).on('click','.header-button',function(){
     init_page($(this).data('name'));
 });
@@ -145,8 +135,8 @@ async function load_products(){
         display_products();
     } catch(err){
         console.log(err);
-        $('.loading-container').append('<div style="color:red">Une erreur s\'est produite</div>');
-        setTimeout(function(){ load_products()}, 2000);
+        $('.loading-container').html('<div style="color:red">Une erreur s\'est produite</div>');
+        // setTimeout(function(){ load_products()}, 2000);
     }
 }
 
@@ -302,7 +292,7 @@ $("#search-products").on("change", async function(){
     const key = $(this).val();
     let products;
     if(key !== "")
-        products = await ajax2("/ajax/search_products", {key});
+        products = await ajax2("/api/search_products", {key});
 
     index_items(products, "products");
 
@@ -481,7 +471,7 @@ async function load_orders(){
         display_history();
     } catch (err) {
         console.log(err);
-        $('.loading-container').append('<div style="color:red">Une erreur s\'est produite</div>');
+        $('.loading-container').html('<div style="color:red">Une erreur s\'est produite</div>');
         // setTimeout(function(){ load_orders()}, 2000);
     }
 }
@@ -623,7 +613,7 @@ function display_profile_stats(){
 
 
 function display_profile(){
-    let {phone_number, address, pic} = JSON.parse(GV.user.content);
+    let {phone_number, address, pic} = (GV.user.content);
     $('#user-profile-name').text(GV.user.name);
     $('#user-profile-phone-number').text(phone_number);
     $('#update-phone_number').val(phone_number);
@@ -639,9 +629,9 @@ function display_profile(){
 }
 
 
-$(document).on('click','#profile-update', function(){
+$(document).on('click','#profile-update', async function(){
     if(!check_form($(this))){return;}
-    let user = JSON.stringify({
+    const user = {
         id: GV.user.id,
         name: $('#update-name').val(),
         email: $('#update-email').val(),
@@ -650,22 +640,19 @@ $(document).on('click','#profile-update', function(){
             phone_number: $('#update-phone_number').val(),
             pic: null
         }
-    }); 
+    }; 
 
-    ajax( GV.base_url+'ajax/update_user', { user }, function(data){
-        console.log(data);
-        if(data['password_missmatch']){
-            $('#profile-update-error').text('Mot de passe non correspondant');
-            $('#update-password').css('border','2px solid red');
-            return;
-        }   
-        $('#profile-update-error').text('');
-
-        $('#update-password').css('border','none');
-        GV.user = data['user'];
-        fade_panel($('.active-panel'),false);
-        init_page("profile");
-    }, function(err){},$(this));
+    const {error} = await ajax2(GV.base_url+'ajax/update_user', {user});
+    if(error){
+        $('#profile-update-error').text('Mot de passe non correspondant');
+        $('#update-password').css('border','2px solid red');
+        return;
+    }   
+    $('#profile-update-error').text('');
+    $('#update-password').css('border','none');
+    GV.user = user;
+    fade_panel($('.active-panel'),false);
+    init_page("profile");
 });
 
 

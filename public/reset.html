@@ -61,7 +61,7 @@
 
         $(document).on("click", "button", async function(e){
             if (check_form()) return;
-            await ajax2("/ajax/reset_password", {email: GV.email, password: $(':password').val()});
+            await ajax2("/api/reset_password", {email: GV.email, password: $(':password').val()});
             alert("Mot de passe réinitialisé avec succés");
             close();
         });

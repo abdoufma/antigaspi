@@ -1,11 +1,11 @@
 module.exports = {
-    BASE_URL: "https://antigaspi.dz/",
+    BASE_URL: "http://localhost/",
     FCM_SERVER_KEY : "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTVkpajocntBhu-8JioVd0K-_UjcpoFct0EdHYstgNJlJYpxSnxJ5WG8JdrP5MSdcBMvwD0bSa1Zbe_9EtMqABP5S0bt94B7v7L",
     MAPS_API_KEY : 'AIzaSyA3kg7YWugGl1lTXmAmaBGPNhDW9pEh5bo',
     dbConfig: {
         host:'localhost',
-        user:'devlog',
-        password:'TestingThis43?#@', 
+        user:'root',
+        password:'',
         database:'antigaspi'
     },
     sessionConfig : {

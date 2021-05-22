@@ -343,7 +343,17 @@
 
     <script src="./js/general_functions.js"></script> 
     <script>
-        GV={...GV, base_url:'./', ajax_url:'./a', android:false, swipers:{}, functions:{}, token:false};    
+        const GV = {base_url:'./', ajax_url:'./a', android:false, swipers:{}, functions:{}, suppliers : {}, products : [], indexed_products : {}, carts : {}, orders : {}, token:false };    
+        GV.user = {{{user}}};
+
+        GV.longi = 3.0100658000000067;
+        GV.lati = 36.7574811;
+        GV.place_name = "Adresse non spécifiée";
+        GV.fcm_server_key = "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTVkpajocntBhu-8JioVd0K-_UjcpoFct0EdHYstgNJlJYpxSnxJ5WG8JdrP5MSdcBMvwD0bSa1Zbe_9EtMqABP5S0bt94B7v7L"
+        GV.selected_big_category = undefined;
+        GV.sort_dir = "desc";
+        GV.sort_option = "date";
+
         $(document).ready(function(){  
             initialize_map($('#my-map'),'36.785090','3.062206', 16);
             init_page('main');
