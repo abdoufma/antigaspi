@@ -4,8 +4,8 @@ const db = require('./db.js');
 const fn = require('./functions.js');
 const upload = require('./upload.js');
 const apiHandler = require('./api_handler');
-const fetch = require('node-fetch');
-const {BASE_URL, MAPS_API_KEY} = require('./config');
+// const fetch = require('node-fetch');
+// const {BASE_URL, MAPS_API_KEY} = require('./config');
 const { readFileSync } = require('fs');
 
 
