@@ -1,6 +1,7 @@
 //@ts-check
 const db = require('./db.js');
 const fs = require('fs');
+const {createHmac} = require("crypto");
 const request = require('request');
 const path = require('path');
 const base_url = path.join(__dirname,'public/');
@@ -9,6 +10,7 @@ const fcm_server_key = "AAAA0DAm3nM:APA91bGQaePMKOsvT-ClU7bv1a1xVqUlzFsc7gQm1kTV
 
 const fn = {};
 const tl = require("./translations.json");
+const {SECRET_KEY} = require("./config");
 
 fn.render = (req, res, file, variables, lang) => {
 	let file_content = fs.readFileSync(`${base_url+file}.html`).toString();  
@@ -184,23 +186,44 @@ fn.signup = async function (req, res){
 fn.login = async function(req, res){
 	let {email, password} = req.body;		
 	try {
-		let user = await db.select('*', "users", {email, password}, 'row');	
-		console.log(user);
-		if(user){
-			if(user.active === -1){
-				res.status(403).send({error:"Ce Compte à été banni par l'administateur du site."});
-			}else{
-				req.session.user_id = user.id;
-				res.send({user});	
-			}
-		}else{
-			res.status(400).send({error:"Identifiants invalides."});
-		}
+		const user = await db.select('*', "users", {email}, 'row');	
+		// let user = await db.select('*', "users", {email, password}, 'row');	
+        if(user){
+            if(verify_password(password, user.hashed_password)){
+                if(user.active === -1){
+					res.status(403).send({error:"Ce Compte à été banni par l'administateur du site."});
+				}else{
+					req.session.user_id = user.id;
+					res.send({user});	
+				}
+            }else{
+				// Wrong Password
+                res.status(400).send({error:"Identifiants invalides"});
+            }
+        }else{
+			// no user found
+            console.log("user not found");
+			res.status(400).send({error:"Identifiants invalides"});
+        }
+
+
 	} catch (err) {
 			console.error(err);
 			res.status(500).json({error:err});
 	}
 }
+
+
+async function hash_password(password){
+    return createHmac('sha256', SECRET_KEY).update(password).digest('hex');
+}
+
+function verify_password(password, hash){
+    const hashed_password = createHmac('sha256', SECRET_KEY).update(password).digest('hex');
+    return hashed_password === hash;
+}
+
+
 
 
 fn.send_notification = function(title, body, token, image){
@@ -215,7 +238,7 @@ fn.send_notification = function(title, body, token, image){
 			body:payload,
 			headers:{'Authorization': `key=${fcm_server_key}`},
 			json: true
-		}; 
+	}; 
 
 	return new Promise( (resolve, reject) => {
 		request.post(options, (err, res, _body) => {

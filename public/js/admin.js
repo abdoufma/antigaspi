@@ -9,7 +9,7 @@ $(document).on('click','.header-button', async function(){
         $('.header-button div:last-child').text("");
         GV.token = window.android.getToken();
         try{
-            await ajax2(GV.base_url+'ajax/save_token', {id:GV.user.id, token:GV.token});
+            await ajax2(GV.api_url+'save_token', {id:GV.user.id, token:GV.token});
         }catch(e){alert(JSON.stringify(e));}
     } else console.log('f off');
 });
@@ -35,7 +35,7 @@ function init_page(name){
 async function load_all(callback){
     try {
         let supplier_id = GV.isSupplier ? GV.user.id : 0;
-        let data = await ajax2(GV.base_url+'ajax/load_all', {supplier_id});
+        let data = await ajax2(GV.api_url+'load_all', {supplier_id});
         if(data.error) {console.log(data.error); return;}
         index_items(data)
         callback();
@@ -193,9 +193,9 @@ $(document).on('click','.save-item', async function(){
     let data;
 
     if(table == "suppliers"){
-        data = await ajax2( GV.base_url+'ajax/save_user', {item:{...item, type: "supplier"}});
+        data = await ajax2( GV.api_url+'save_user', {item:{...item, type: "supplier"}});
     }else{
-        data = await ajax2( GV.base_url+'ajax/save_item', { item ,table}, $button);
+        data = await ajax2( GV.api_url+'save_item', { item ,table}, $button);
     }
 
 
@@ -225,9 +225,9 @@ $(document).on('click','.delete-element', function(e){
         $(`.table-element[data-id="${id}"]`).addClass('deleted-element');
         try{
             if(isUser){
-                await ajax2( GV.base_url+'ajax/delete_user', {id});
+                await ajax2( GV.api_url+'delete_user', {id});
             }else {
-                await ajax2( GV.base_url+'ajax/delete_item', {id, table_name:"products"});
+                await ajax2( GV.api_url+'delete_item', {id, table_name:"products"});
                 $(`#${table_name}-table .table-element[data-id="${id}"]`).slideUp();
             }
             // else{}
@@ -247,9 +247,9 @@ $(document).on('click','.delete-user', function(e){
         $(`.table-element[data-id="${id}"]`).addClass('deleted-element');
         try{
             if(isUser){
-                await ajax2( GV.base_url+'ajax/delete_user', {id});
+                await ajax2( GV.api_url+'delete_user', {id});
             }else {
-                await ajax2( GV.base_url+'ajax/delete_item', {id, table_name:"products"});
+                await ajax2( GV.api_url+'delete_item', {id, table_name:"products"});
                 $(`#${table_name}-table .table-element[data-id="${id}"]`).slideUp();
             }
             // else{
@@ -310,7 +310,7 @@ $(document).on('click','.activation-btn', async function(){
     if(GV.suppliers[id].active == 0){active=1;}
 
     let item = {id, active}
-    let data = await ajax2( GV.base_url+'ajax/save_item', { item ,table:"users"}, $(this));
+    let data = await ajax2( GV.api_url+'save_item', { item ,table:"users"}, $(this));
     try{ GV.last_inserted_element = data[table][0].id;}catch(e){}
     index_items(data);
     $(`.active-header-button`).click();

@@ -9,4 +9,5 @@ config.js
 .vscode
 config.js
 package.json
+package-lock.json
 ./config.js

@@ -549,7 +549,7 @@
     <script>
         console.log({GV});
         
-        GV={...GV, base_url:'./', android:false, swipers:{}, functions:{}};    
+        GV={...GV, base_url:'./', api_url:'/api/', android:false, swipers:{}, functions:{}};    
         $(document).ready(function(){
             $('.header-button[data-name="orders"]').click();
             $('.header-admin-name').text(GV.user.name);

@@ -20,7 +20,7 @@ app.use(express.static(join(__dirname, 'public')));
 app.set('views', join(__dirname, '/public'));
 app.use(router);
 
-app.use((_, res, next) => res.render("404", {message: "you done fu**ed up son!"}));
+// app.use((_, res, next) => res.render("404", {message: "you done fu**ed up son!"}));
 
 
 app.listen(PORT, () => console.log(`listenning on *:${PORT}`));

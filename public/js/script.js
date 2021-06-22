@@ -123,7 +123,7 @@ $(document).on('click','#save-map', function(){
 async function load_products(){
     $('#products-area').html(loading_html());
     try{
-        const {products, suppliers, carts} = await ajax2(GV.base_url+'ajax/load_products', { lati:GV.lati, longi:GV.longi});
+        const {products, suppliers, carts} = await ajax2(GV.api_url+'load_products', { lati:GV.lati, longi:GV.longi});
         
         // index(products);
         GV.products = products;
@@ -330,7 +330,7 @@ GV.functions.qoffas = async () => {
 }
 
 async function load_qoffas(){
-    const {baskets, err} = await ajax2(GV.base_url+'ajax/load_baskets');
+    const {baskets, err} = await ajax2(GV.api_url+'load_baskets');
     if (err) console.log(err);
     GV.baskets = baskets;
 }
@@ -461,7 +461,7 @@ $(document).on('click','#orders-filter .tab-button', function () {
 
 async function load_orders(){
     try {
-        const data = await ajax2( GV.base_url+'ajax/load_orders', { user_id:GV.user.id});
+        const data = await ajax2( GV.api_url+'load_orders', { user_id:GV.user.id});
         console.log(data);
         index_all(data);
         index(data.products)
@@ -568,7 +568,7 @@ function old_order_element(order, product, supplier){
 
 $(document).on('click','.delete-order',async function(){
     const order_id = $(this).closest('.product-element').data('id');
-    await ajax2( GV.base_url+'ajax/delete_item', {table_name:'orders', id:order_id});
+    await ajax2( GV.api_url+'delete_item', {table_name:'orders', id:order_id});
     init_page("history");
 });
 
@@ -577,7 +577,7 @@ $(document).on('click','.change-order-status', async function(){
     const status = $(this).data('status');
     try{
         console.log({order_id, status});
-        await ajax2( GV.base_url+'ajax/change_order_status', {order_id, status});
+        await ajax2( GV.api_url+'change_order_status', {order_id, status});
         init_page("history");
     }catch(e){
         console.log(e);
@@ -642,7 +642,7 @@ $(document).on('click','#profile-update', async function(){
         }
     }; 
 
-    const {error} = await ajax2(GV.base_url+'ajax/update_user', {user});
+    const {error} = await ajax2(GV.api_url+'update_user', {user});
     if(error){
         $('#profile-update-error').text('Mot de passe non correspondant');
         $('#update-password').css('border','2px solid red');
@@ -718,7 +718,7 @@ async function save_order(){
     
     try {
         console.log("saving...", order);
-        await ajax2(GV.base_url+'ajax/save_order', {order});
+        await ajax2(GV.api_url+'save_order', {order});
         fade_panel($('#order-success-panel'), true);
     } catch (e) {
         console.error(e);

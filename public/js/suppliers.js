@@ -25,7 +25,7 @@ function navigate_to(page_name){
 
 async function load_all(){
     try {
-        let data = await ajax2( GV.base_url+'ajax/load_all', { supplier_id: GV.supplier.id});
+        let data = await ajax2( GV.api_url+'load_all', { supplier_id: GV.supplier.id});
         index_all(data);
     } catch (err) {
         $('.loading-container').append("<div style='color:red'>Une erreur s'est produite</div>");
@@ -35,7 +35,7 @@ async function load_all(){
 async function load_orders(){
     try {
         let {id} = GV.supplier;
-        const {orders} = await ajax2(GV.base_url+'ajax/load_orders', {supplier_id: id});
+        const {orders} = await ajax2(GV.api_url+'load_orders', {supplier_id: id});
         console.log(orders);
         index_all(orders);
     } catch (e) {
@@ -76,7 +76,7 @@ GV.functions.carts = async function(){
         if ("android" in window){
             GV.token = window.android.getToken();
             console.log("got em", GV.token);
-            ajax2(GV.base_url+'ajax/save_token', {id:GV.supplier.id, token:GV.token});
+            ajax2(GV.api_url+'save_token', {id:GV.supplier.id, token:GV.token});
         } else console.log('fuck off, filthy desktop user!');
     
         requestLocationPermission();
@@ -372,7 +372,7 @@ $(document).on('click','#save-basket', async function(){
 
     
     try {
-        await ajax2(GV.base_url+'ajax/save_basket', {basket});
+        await ajax2(GV.api_url+'save_basket', {basket});
         fade_panel($('#new-basket-panel'), false);
         $('.header-button[data-name="products"]').click();
     } catch (err) {
@@ -524,7 +524,7 @@ $(document).on('click','#save-product', async function(){
     product['image'] = $('#product-image-name').val();
 
     try {
-        let res = await ajax2(GV.base_url+'ajax/save_product', {product});
+        let res = await ajax2(GV.api_url+'save_product', {product});
         console.log(res);
         GV.products[res.id] = res;
         if(GV.basket_product){
@@ -636,7 +636,7 @@ $(document).on('click','#save-profile', async function(){
 
     if(  $('#supplier-logo-name').val() == "" ){ $('#save-profile-error').text('Upload de l\'image toujours en cours'); return; }
 
-    let res = await ajax2( GV.base_url+'ajax/save_profile', {supplier});
+    let res = await ajax2( GV.api_url+'save_profile', {supplier});
     if(res.error){
         console.log(res.error);
     }else{

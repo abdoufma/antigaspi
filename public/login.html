@@ -23,7 +23,7 @@
 <body>      
 	<script>
 
-		const GV = { swipers:{}, functions:{}, fb_app_id:"387635348411174"};    
+		const GV = { swipers:{}, functions:{}, fb_app_id:"387635348411174", base_url:'/'};    
 	
 		window.fbAsyncInit = function() {
 		    FB.init({
@@ -115,14 +115,15 @@
 			console.log({email, password});
 			try {
 				console.log("logging user in...");
-				await ajax2(GV.base_url+'login', {email, password});	
-				console.log("done");
+				const {error, user} = await ajax2(GV.base_url+'login', {email, password});	
+				if(error) aler(error);
 				window.location.reload();
 				
 			} catch (err) {
-				console.log(err);
-				let {responseJSON} = err;
-				$('#login-error').html(responseJSON.error);
+				let {responseJSON, responseText} = err;
+				const error_message = responseJSON ? responseJSON.error : responseText;
+				console.log(error_message);
+				$('#login-error').html(error_message);
 				$('#reset-password-container').css({display:"block"});
 			}
 		}

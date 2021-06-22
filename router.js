@@ -81,7 +81,7 @@ router.post(`/signup`, async (req, res, next) => {
 
 router.post(`/login`, async (req,res) => {
 	console.log("loggin in...")
-	await fn.login(req,res);
+	return await fn.login(req,res);
 });
 
 
